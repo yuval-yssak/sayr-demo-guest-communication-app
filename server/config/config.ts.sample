@@ -3,4 +3,7 @@ const mongoDBConfig = {
   DBUrl: 'mongodb://localhost'
 }
 
-export { mongoDBConfig }
+const jwt = {
+  secretKey: 'bydr28uldil8q7330rpy47y0a5w0c9uw0hzw9le24myk5vcviozcoma'
+}
+export { mongoDBConfig, jwt }

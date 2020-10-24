@@ -5,6 +5,7 @@
   "license": "MIT",
   "devDependencies": {
     "@types/bcryptjs": "^2.4.2",
+    "@types/jsonwebtoken": "^8.5.0",
     "@types/mongodb": "^3.5.31",
     "@types/node": "^14.14.2",
     "ts-node": "^9.0.0",
@@ -16,6 +17,7 @@
     "bcryptjs": "^2.4.3",
     "express": "^4.17.1",
     "graphql": "^15.3.0",
+    "jsonwebtoken": "^8.5.1",
     "mongodb": "^3.6.2",
     "reflect-metadata": "^0.1.13",
     "type-graphql": "^1.1.0"
