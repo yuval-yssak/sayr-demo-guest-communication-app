@@ -4,6 +4,8 @@ const mongoDBConfig = {
 }
 
 const jwt = {
-  secretKey: 'bydr28uldil8q7330rpy47y0a5w0c9uw0hzw9le24myk5vcviozcoma'
+  secretKeyForAccess: 'bydr28uldil8q7330rpy47y0a5w0c9uw0hzw9le24myk5vcviozcoma',
+  secretKeyForRefresh: 'znsx6anpfj8vnplxdbxr68ijdfnusgrtpo1zdacyhqmnhcusfcy9xs'
+
 }
 export { mongoDBConfig, jwt }

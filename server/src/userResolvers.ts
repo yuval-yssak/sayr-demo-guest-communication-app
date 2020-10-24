@@ -5,24 +5,14 @@ import {
   Arg,
   ObjectType,
   Field,
-  ID
+  Ctx,
+  UseMiddleware
 } from 'type-graphql'
 import { compare, hash } from 'bcryptjs'
-import { ObjectID } from 'mongodb'
-import { sign } from 'jsonwebtoken'
 import usersDAO from './dao/usersDAO'
-import { jwt } from '../config/config'
-
-@ObjectType()
-class UserType {
-  @Field(() => ID)
-  _id: ObjectID
-
-  @Field()
-  email: string
-
-  password: string
-}
+import { MyContext } from './MyContext'
+import { UserType, createAccessToken, createRefreshToken } from './auth'
+import { isAuth } from './isAuth'
 
 @ObjectType()
 class LoginResponse {
@@ -35,6 +25,13 @@ class UserResolver {
   @Query(() => String)
   hello() {
     return 'Hello world!!!!'
+  }
+
+  @Query(() => String)
+  @UseMiddleware(isAuth)
+  tellASecret(@Ctx() { payload }: MyContext) {
+    console.log(JSON.stringify(payload))
+    return `secret info..., your user id is ${payload.userId}`
   }
 
   @Mutation(() => Boolean)
@@ -52,10 +49,12 @@ class UserResolver {
     }
     return true
   }
+
   @Mutation(() => LoginResponse)
   async login(
     @Arg('email') email: string,
-    @Arg('password') password: string
+    @Arg('password') password: string,
+    @Ctx() { res }: MyContext
   ): Promise<LoginResponse> {
     const user: UserType | undefined = (
       await usersDAO.findArray({ email })
@@ -66,9 +65,10 @@ class UserResolver {
     const valid: boolean = await compare(password, user.password)
     if (!valid) throw new Error('wrong password')
 
-    const accessToken = sign({ userId: user._id }, jwt.secretKey, {
-      expiresIn: '15m'
-    })
+    const accessToken = createAccessToken(user)
+    const refreshToken = createRefreshToken(user)
+
+    res.cookie('rx', refreshToken, { httpOnly: true })
 
     return { accessToken }
   }
