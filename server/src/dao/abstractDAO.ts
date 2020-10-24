@@ -1,4 +1,9 @@
-import { MongoClient, Collection, FilterQuery } from 'mongodb'
+import {
+  MongoClient,
+  Collection,
+  FilterQuery,
+  CollectionInsertOneOptions
+} from 'mongodb'
 
 class abstractDAO {
   databaseName: string
@@ -45,7 +50,7 @@ class abstractDAO {
     return await this.collection.find(filter, options).toArray()
   }
   async *findSequence(filter: FilterQuery<any>, options = {}) {
-    const cursor = await this.collection.find(filter, options)
+    const cursor = this.collection.find(filter, options)
 
     while (await cursor.hasNext()) {
       yield await cursor.next()
@@ -58,7 +63,7 @@ class abstractDAO {
   }
 
   async *aggregateSequence(pipeline: object[], options = {}) {
-    const cursor = await this.collection.aggregate(pipeline, options)
+    const cursor = this.collection.aggregate(pipeline, options)
 
     while (await cursor.hasNext()) {
       yield await cursor.next()
@@ -70,6 +75,10 @@ class abstractDAO {
       upsert: true,
       ...options
     })
+  }
+
+  async insertOne(doc: any, options?: CollectionInsertOneOptions) {
+    return await this.collection.insertOne(doc, options)
   }
 
   initializeUnorderedBulkOp() {

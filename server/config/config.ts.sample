@@ -1,6 +1,6 @@
-const mongoDB = {
+const mongoDBConfig = {
   dbName: 'jwt-experiment',
   DBUrl: 'mongodb://localhost'
 }
 
-export { mongoDB as mongoDBConfig }
+export { mongoDBConfig }
