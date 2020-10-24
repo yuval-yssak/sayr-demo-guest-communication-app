@@ -1,4 +1,8 @@
-import { Resolver, Query } from 'type-graphql'
+import {
+  Resolver,
+  Query
+  // , Mutation, Arg
+} from 'type-graphql'
 
 @Resolver()
 export class UserResolver {
@@ -6,4 +10,10 @@ export class UserResolver {
   hello() {
     return 'Hello world!!!!'
   }
+
+  // @Mutation()
+  // register(@Arg('email') email: string, @Arg('password') password: string) {
+  //   console.log(email, password)
+  //   return
+  // }
 }
