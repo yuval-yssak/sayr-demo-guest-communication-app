@@ -3,6 +3,12 @@ import { ObjectID } from 'mongodb'
 import { jwt } from '../config/config'
 import { sign } from 'jsonwebtoken'
 
+import { Request, Response } from 'express'
+import 'reflect-metadata'
+import { verify } from 'jsonwebtoken'
+import usersDao from './dao/usersDAO'
+import { ObjectId } from 'mongodb'
+
 @ObjectType()
 class UserType {
   @Field(() => ID)
@@ -32,4 +38,38 @@ function createRefreshToken(user: UserType): string {
   })
 }
 
-export { UserType, createAccessToken, createRefreshToken, LoginPayload }
+async function exchangeToken(req: Request, res: Response): Promise<void> {
+  try {
+    const token = req.cookies.rx as string
+
+    if (token) {
+      let payload: LoginPayload
+
+      payload = verify(token, jwt.secretKeyForRefresh) as LoginPayload
+
+      if (payload) {
+        const user = (
+          await usersDao.findArray({ _id: new ObjectId(payload.userId) })
+        )?.[0]
+
+        if (user) {
+          const newExchangeToken = createRefreshToken(user)
+          res.cookie('rx', newExchangeToken, { httpOnly: true })
+          res.send({ ok: true, accessToken: createAccessToken(user) })
+          return
+        }
+      }
+    }
+    res.send({ ok: false, accessToken: '' })
+  } catch (e) {
+    console.error(e)
+    res.send({ ok: false, accessToken: '' })
+  }
+}
+export {
+  UserType,
+  createAccessToken,
+  createRefreshToken,
+  LoginPayload,
+  exchangeToken
+}
