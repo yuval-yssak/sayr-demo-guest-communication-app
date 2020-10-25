@@ -7,7 +7,6 @@ import { Request, Response } from 'express'
 import 'reflect-metadata'
 import { verify } from 'jsonwebtoken'
 import usersDao from './dao/usersDAO'
-import { ObjectId } from 'mongodb'
 
 @ObjectType()
 class UserType {
@@ -18,21 +17,30 @@ class UserType {
   email: string
 
   password: string
+
+  tokenVersion: number
 }
 
 interface LoginPayload {
   userId: ObjectID
+  tokenVersion: number
 }
 
 function createAccessToken(user: UserType): string {
-  const payload: LoginPayload = { userId: user._id }
+  const payload: LoginPayload = {
+    userId: user._id,
+    tokenVersion: user.tokenVersion
+  }
   return sign(payload, jwt.secretKeyForAccess, {
     expiresIn: '15m'
   })
 }
 
 function createRefreshToken(user: UserType): string {
-  const payload: LoginPayload = { userId: user._id }
+  const payload: LoginPayload = {
+    userId: user._id,
+    tokenVersion: user.tokenVersion
+  }
   return sign(payload, jwt.secretKeyForRefresh, {
     expiresIn: '7d'
   })
@@ -44,19 +52,20 @@ async function exchangeToken(req: Request, res: Response): Promise<void> {
 
     if (token) {
       let payload: LoginPayload
-
       payload = verify(token, jwt.secretKeyForRefresh) as LoginPayload
-
+      console.log(payload)
       if (payload) {
         const user = (
-          await usersDao.findArray({ _id: new ObjectId(payload.userId) })
+          await usersDao.findArray({ _id: new ObjectID(payload.userId) })
         )?.[0]
 
         if (user) {
-          const newExchangeToken = createRefreshToken(user)
-          res.cookie('rx', newExchangeToken, { httpOnly: true })
-          res.send({ ok: true, accessToken: createAccessToken(user) })
-          return
+          if (user.tokenVersion! === payload.tokenVersion) {
+            const newExchangeToken = createRefreshToken(user)
+            res.cookie('rx', newExchangeToken, { httpOnly: true })
+            res.send({ ok: true, accessToken: createAccessToken(user) })
+            return
+          }
         }
       }
     }

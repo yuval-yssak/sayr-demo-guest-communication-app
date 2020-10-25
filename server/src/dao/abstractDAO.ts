@@ -2,7 +2,8 @@ import {
   MongoClient,
   Collection,
   FilterQuery,
-  CollectionInsertOneOptions
+  CollectionInsertOneOptions,
+  UpdateQuery
 } from 'mongodb'
 
 class abstractDAO {
@@ -75,6 +76,10 @@ class abstractDAO {
       upsert: true,
       ...options
     })
+  }
+
+  async updateOne(filter: FilterQuery<any>, update: UpdateQuery<any>) {
+    return await this.collection.updateOne(filter, update)
   }
 
   async insertOne(doc: any, options?: CollectionInsertOneOptions) {

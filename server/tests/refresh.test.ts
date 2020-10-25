@@ -4,13 +4,14 @@ import axios from 'axios'
 import axiosCookieJarSupport from 'axios-cookiejar-support'
 import toughCookie, { Cookie } from 'tough-cookie'
 
-const url = 'http://localhost:4000/refresh-token'
+const refreshTokenUrl = 'http://localhost:4000/refresh-token',
+  graphqlUrl = 'http://localhost:4000/graphql'
 
 describe('test exchanging tokens', function () {
   const axiosWithCookies = axiosCookieJarSupport(axios)
 
   it('posts without a cookie', async function () {
-    const response = await axiosWithCookies.post(url, '', {
+    const response = await axiosWithCookies.post(refreshTokenUrl, '', {
       withCredentials: true
     })
 
@@ -23,9 +24,9 @@ describe('test exchanging tokens', function () {
     const cookie = new Cookie({ key: 'rx', value: '123', httpOnly: true })
 
     const cookiejar = new toughCookie.CookieJar()
-    cookiejar.setCookieSync(cookie, url)
+    cookiejar.setCookieSync(cookie, refreshTokenUrl)
 
-    const response = await axiosWithCookies.post(url, '', {
+    const response = await axiosWithCookies.post(refreshTokenUrl, '', {
       jar: cookiejar,
       withCredentials: true
     })
@@ -42,17 +43,45 @@ describe('test exchanging tokens', function () {
     }`
 
     await axiosWithCookies.post(
-      'http://localhost:4000/graphql',
+      graphqlUrl,
       { query },
       { jar: cookiejar, withCredentials: true }
     )
 
-    const response = await axiosWithCookies.post(url, 'text', {
+    const response = await axiosWithCookies.post(refreshTokenUrl, 'text', {
       jar: cookiejar,
       withCredentials: true
     })
 
     expect(response.data).to.include({ ok: true })
     expect(response.data.accessToken).to.not.be.empty
+  })
+
+  it('refresh afer revoking token', async function () {
+    const cookiejar = new toughCookie.CookieJar()
+    const query = `mutation {
+      login(email: "test@example.org", password: "123") {
+        accessToken  
+      }
+    }`
+
+    const revokeTokenQuery = `mutation {
+      revokeRefreshTokensForUser(userId: "5f95e44bea88e13e8f972f5c")
+    }`
+
+    await axiosWithCookies.post(
+      graphqlUrl,
+      { query },
+      { jar: cookiejar, withCredentials: true }
+    )
+
+    await axiosWithCookies.post(graphqlUrl, { query: revokeTokenQuery })
+
+    const response = await axiosWithCookies.post(refreshTokenUrl, '', {
+      jar: cookiejar,
+      withCredentials: true
+    })
+
+    expect(response.data).to.deep.include({ ok: false, accessToken: '' })
   })
 })

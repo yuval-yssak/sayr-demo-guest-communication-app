@@ -3,6 +3,7 @@ import {
   Query,
   Mutation,
   Arg,
+  ID,
   ObjectType,
   Field,
   Ctx,
@@ -13,6 +14,7 @@ import usersDAO from './dao/usersDAO'
 import { MyContext } from './MyContext'
 import { UserType, createAccessToken, createRefreshToken } from './auth'
 import { isAuth } from './isAuth'
+import { ObjectID } from 'mongodb'
 
 @ObjectType()
 class LoginResponse {
@@ -41,7 +43,11 @@ class UserResolver {
     const hashedPassword = await hash(password, 10)
 
     try {
-      await usersDAO.insertOne({ email, password: hashedPassword })
+      await usersDAO.insertOne({
+        email,
+        password: hashedPassword,
+        tokenVersion: 0
+      })
     } catch (e) {
       console.error(e)
       return false
@@ -71,6 +77,15 @@ class UserResolver {
 
     return { accessToken }
   }
-}
 
+  @Mutation(() => Boolean)
+  async revokeRefreshTokensForUser(@Arg('userId', () => ID) userId: ObjectID) {
+    console.log(arguments)
+    await usersDAO.updateOne(
+      { _id: new ObjectID(userId) },
+      { $inc: { tokenVersion: 1 } as any }
+    )
+    return true
+  }
+}
 export { UserResolver, UserType }
