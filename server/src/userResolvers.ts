@@ -30,7 +30,6 @@ class UserResolver {
   @Query(() => String)
   @UseMiddleware(isAuth)
   tellASecret(@Ctx() { payload }: MyContext) {
-    console.log(JSON.stringify(payload))
     return `secret info..., your user id is ${payload.userId}`
   }
 
