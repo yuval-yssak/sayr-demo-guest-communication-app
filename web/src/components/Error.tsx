@@ -1,11 +1,19 @@
 import React from 'react'
-import { ClientError } from 'graphql-request/dist/src/types'
+import { GraphQLResponse } from 'graphql-request/dist/src/types'
 
-function Error({ error }: { error: ClientError }) {
+function Error({ error }: { error: any }) {
   return (
     <>
       <p>Error</p>
-      <pre>{error.response.errors?.map(e => e.message).join('\n\n')}</pre>
+      {error?.response ? (
+        <pre>
+          {(error.response as GraphQLResponse)?.errors
+            ?.map(e => e.message)
+            .join('\n\n')}
+        </pre>
+      ) : (
+        (error as Error).message
+      )}
     </>
   )
 }
