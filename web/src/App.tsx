@@ -1,28 +1,20 @@
 import React, { useContext } from 'react'
 import { observer } from 'mobx-react-lite'
-import { StoreContext, useQuery } from './models/reactUtils'
-import Error from './components/Error'
-
-const SimpleQuery = observer(function SimpleQuery() {
-  const { data, loading, error } = useQuery(store => store.queryHello())
-  return (
-    <>
-      {error && <Error error={error} />}
-      {data?.hello}
-      {loading && <p>Loading...</p>}
-    </>
-  )
-})
-
-const SomethingElse = () => <p>something else</p>
+import { StoreContext } from './models/reactUtils'
+import Home from './pages/Home'
+import Register from './pages/Register'
+import Login from './pages/Login'
+import Header from './components/Header'
 
 function renderPage(view: any) {
   console.log('rendering', view.page)
   switch (view.page) {
-    case '/something-else':
-      return <SomethingElse />
     case '/':
-      return <SimpleQuery />
+      return <Home />
+    case '/register':
+      return <Register />
+    case '/login':
+      return <Login />
     default:
       return 'Sry, not found'
   }
@@ -30,7 +22,12 @@ function renderPage(view: any) {
 
 function App() {
   const store = useContext(StoreContext)
-  return <>{renderPage(store.view)}</>
+  return (
+    <>
+      <Header />
+      {renderPage(store.view)}
+    </>
+  )
 }
 
 export default observer(App)
