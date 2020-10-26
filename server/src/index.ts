@@ -6,9 +6,16 @@ import { UserResolver } from './userResolvers'
 import { loadDataAccess } from './loaders/mainLoader'
 import cookieParser from 'cookie-parser'
 import { exchangeToken } from './auth'
+import cors from 'cors'
 
 const app = express()
 app.use(cookieParser())
+app.use(
+  cors({
+    credentials: true,
+    origin: 'http://localhost:3000'
+  })
+)
 app.get('/', (_req, res) => res.send('hello'))
 
 app.post('/refresh-token', exchangeToken)
@@ -21,7 +28,7 @@ async function start() {
     context: ({ req, res }) => ({ req, res })
   })
 
-  apolloServer.applyMiddleware({ app })
+  apolloServer.applyMiddleware({ app, cors: false })
   app.listen(4000, () => console.log('listening on port 4000.'))
 }
 

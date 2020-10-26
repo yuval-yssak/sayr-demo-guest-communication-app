@@ -8,7 +8,10 @@ import { reaction } from 'mobx'
 import { routeMap, createRouter } from './models/view'
 
 const rootStore = RootStore.create(undefined, {
-  gqlHttpClient: createHttpClient('http://localhost:4000/graphql')
+  gqlHttpClient: createHttpClient('http://localhost:4000/graphql', {
+    credentials: 'include',
+    mode: 'cors'
+  })
 })
 
 ;(window as any).store = rootStore
