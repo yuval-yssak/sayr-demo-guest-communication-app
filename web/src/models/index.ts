@@ -2,6 +2,7 @@
 /* eslint-disable */
 /* tslint:disable */
 
+export * from "./UserTypeModel"
 export * from "./LoginResponseModel"
 export * from "./RootStore"
 export * from "./reactUtils"

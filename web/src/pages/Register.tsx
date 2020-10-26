@@ -7,7 +7,9 @@ function Register() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
 
-  const { data, loading, error, setQuery } = useQuery()
+  const { data, loading, error, setQuery } = useQuery(undefined, {
+    fetchPolicy: 'no-cache' // not working for mutations :(
+  })
 
   const store = useContext(StoreContext)
 
@@ -17,7 +19,7 @@ function Register() {
 
   useEffect(() => {
     if (data) setTimeout(store.view.openHomepage, 1000)
-  }, [data])
+  }, [data, store.view.openHomepage])
 
   return (
     <form

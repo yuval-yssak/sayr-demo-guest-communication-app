@@ -5,6 +5,8 @@ import { ObservableMap } from "mobx"
 import { types } from "mobx-state-tree"
 import { MSTGQLStore, configureStoreMixin, QueryOptions, withTypedRefs } from "mst-gql"
 
+import { UserTypeModel, UserTypeModelType } from "./UserTypeModel"
+import { userTypeModelPrimitives, UserTypeModelSelector } from "./UserTypeModel.base"
 import { LoginResponseModel, LoginResponseModelType } from "./LoginResponseModel"
 import { loginResponseModelPrimitives, LoginResponseModelSelector } from "./LoginResponseModel.base"
 
@@ -12,7 +14,7 @@ import { loginResponseModelPrimitives, LoginResponseModelSelector } from "./Logi
 
 /* The TypeScript type that explicits the refs to other models in order to prevent a circular refs issue */
 type Refs = {
-
+  userTypes: ObservableMap<string, UserTypeModelType>
 }
 
 
@@ -21,6 +23,7 @@ type Refs = {
 */
 export enum RootStoreBaseQueries {
 queryHello="queryHello",
+queryUsers="queryUsers",
 queryTellASecret="queryTellASecret"
 }
 export enum RootStoreBaseMutations {
@@ -34,13 +37,18 @@ mutateRevokeRefreshTokensForUser="mutateRevokeRefreshTokensForUser"
 */
 export const RootStoreBase = withTypedRefs<Refs>()(MSTGQLStore
   .named("RootStore")
-  .extend(configureStoreMixin([['LoginResponse', () => LoginResponseModel]], [], "js"))
+  .extend(configureStoreMixin([['UserType', () => UserTypeModel], ['LoginResponse', () => LoginResponseModel]], ['UserType'], "js"))
   .props({
-
+    userTypes: types.optional(types.map(types.late((): any => UserTypeModel)), {})
   })
   .actions(self => ({
     queryHello(variables?: {  }, options: QueryOptions = {}) {
       return self.query<{ hello: string }>(`query hello { hello }`, variables, options)
+    },
+    queryUsers(variables?: {  }, resultSelector: string | ((qb: UserTypeModelSelector) => UserTypeModelSelector) = userTypeModelPrimitives.toString(), options: QueryOptions = {}) {
+      return self.query<{ users: UserTypeModelType[]}>(`query users { users {
+        ${typeof resultSelector === "function" ? resultSelector(new UserTypeModelSelector()).toString() : resultSelector}
+      } }`, variables, options)
     },
     queryTellASecret(variables?: {  }, options: QueryOptions = {}) {
       return self.query<{ tellASecret: string }>(`query tellASecret { tellASecret }`, variables, options)

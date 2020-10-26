@@ -29,6 +29,11 @@ class UserResolver {
     return 'Hello world!!!!'
   }
 
+  @Query(() => [UserType])
+  async users() {
+    return await usersDAO.findArray({})
+  }
+
   @Query(() => String)
   @UseMiddleware(isAuth)
   tellASecret(@Ctx() { payload }: MyContext) {

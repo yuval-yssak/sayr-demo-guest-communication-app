@@ -10,8 +10,12 @@ import usersDao from './dao/usersDAO'
 
 @ObjectType()
 class UserType {
-  @Field(() => ID)
   _id: ObjectID
+
+  @Field(() => ID)
+  get id() {
+    return this._id
+  }
 
   @Field()
   email: string
