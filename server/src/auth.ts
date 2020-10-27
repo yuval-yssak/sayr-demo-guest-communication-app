@@ -36,7 +36,7 @@ function createAccessToken(user: UserType): string {
     tokenVersion: user.tokenVersion
   }
   return sign(payload, jwt.secretKeyForAccess, {
-    expiresIn: '15m'
+    expiresIn: '15s'
   })
 }
 
@@ -57,7 +57,7 @@ async function exchangeToken(req: Request, res: Response): Promise<void> {
     if (token) {
       let payload: LoginPayload
       payload = verify(token, jwt.secretKeyForRefresh) as LoginPayload
-      console.log(payload)
+
       if (payload) {
         const user = (
           await usersDao.findArray({ _id: new ObjectID(payload.userId) })

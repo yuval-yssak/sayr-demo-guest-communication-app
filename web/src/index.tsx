@@ -39,12 +39,12 @@ reaction(
 )
 
 reaction(
-  () => rootStore.loggedInUser,
-  loggedInUser => {
+  () => rootStore.loggedInUser?.accessToken,
+  accessToken => {
     gqlHttpClient.setHeaders({
-      authentication: loggedInUser ? `bearer ${loggedInUser?.accessToken}` : ''
+      authentication: accessToken ? `bearer ${accessToken}` : ''
     })
-    if (loggedInUser) rootStore.view.openHomepage()
+    if (accessToken) rootStore.view.openHomepage()
   }
 )
 
@@ -55,3 +55,17 @@ window.onpopstate = function historyChange(ev: PopStateEvent) {
 }
 
 router(window.location.pathname)
+
+when(
+  () => !!rootStore.loggedInUser,
+  () => {
+    // runs once after full page refresh, once the logged in user is retreived from local storage
+    if (rootStore.loggedInUser)
+      fetch('http://localhost:4000/refresh-token', {
+        method: 'POST',
+        credentials: 'include'
+      })
+        .then(response => response.json())
+        .then(json => rootStore.loggedInUser?.setAccessToken(json.accessToken))
+  }
+)
