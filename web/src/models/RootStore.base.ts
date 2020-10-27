@@ -40,6 +40,7 @@ export enum RootStoreBaseQueries {
 export enum RootStoreBaseMutations {
   mutateRegister = 'mutateRegister',
   mutateLogin = 'mutateLogin',
+  mutateLogout = 'mutateLogout',
   mutateRevokeRefreshTokensForUser = 'mutateRevokeRefreshTokensForUser'
 }
 
@@ -127,6 +128,13 @@ export const RootStoreBase = withTypedRefs<Refs>()(
             : resultSelector
         }
       } }`,
+          variables,
+          optimisticUpdate
+        )
+      },
+      mutateLogout(variables?: {}, optimisticUpdate?: () => void) {
+        return self.mutate<{ logout: boolean }>(
+          `mutation logout { logout }`,
           variables,
           optimisticUpdate
         )

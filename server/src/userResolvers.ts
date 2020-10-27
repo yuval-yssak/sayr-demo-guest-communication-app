@@ -87,6 +87,12 @@ class UserResolver {
   }
 
   @Mutation(() => Boolean)
+  logout(@Ctx() { res }: MyContext): Boolean {
+    res.clearCookie('rx')
+    return true
+  }
+
+  @Mutation(() => Boolean)
   async revokeRefreshTokensForUser(@Arg('userId', () => ID) userId: ObjectID) {
     console.log(arguments)
     await usersDAO.updateOne(
