@@ -19,14 +19,16 @@ const viewModel = types.optional(
           case '/login':
             return '/login'
           default:
-            return '/404'
+            return self.page
+          // return '/404'
         }
       }
     }))
     .actions(self => ({
       openHomepage: () => (self.page = '/'),
       openRegisterPage: () => (self.page = '/register'),
-      openLoginPage: () => (self.page = '/login')
+      openLoginPage: () => (self.page = '/login'),
+      openSecretPage: () => (self.page = '/secret')
     })),
   { page: '/' }
 )
@@ -39,7 +41,8 @@ interface IRoutes {
 const routeMap: (view: any) => IRoutes = view => ({
   '/': view.openHomepage,
   '/register': view.openRegisterPage,
-  '/login': () => view.openLoginPage()
+  '/login': () => view.openLoginPage(),
+  '/secret': () => view.openSecretPage()
 })
 
 function createRouter(routes: IRoutes) {

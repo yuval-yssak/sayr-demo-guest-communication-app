@@ -20,6 +20,9 @@ import { ObjectID } from 'mongodb'
 class LoginResponse {
   @Field()
   accessToken: string
+
+  @Field()
+  user: UserType
 }
 
 @Resolver()
@@ -80,7 +83,7 @@ class UserResolver {
 
     res.cookie('rx', refreshToken, { httpOnly: true })
 
-    return { accessToken }
+    return { accessToken, user }
   }
 
   @Mutation(() => Boolean)

@@ -11,6 +11,7 @@ const Header: React.FC<Props> = () => {
       <button onClick={() => store.view.openHomepage()}>Home</button>
       <button onClick={() => store.view.openLoginPage()}>Login</button>
       <button onClick={() => store.view.openRegisterPage()}>Register</button>
+      <button onClick={() => store.view.openSecretPage()}>Secret</button>
     </>
   )
 }

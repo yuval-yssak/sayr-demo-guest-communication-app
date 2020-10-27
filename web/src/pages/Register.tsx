@@ -14,10 +14,6 @@ function Register() {
   const store = useContext(StoreContext)
 
   useEffect(() => {
-    console.log(data, loading, error)
-  }, [data, loading, error])
-
-  useEffect(() => {
     if (data) setTimeout(store.view.openHomepage, 1000)
   }, [data, store.view.openHomepage])
 
@@ -26,7 +22,6 @@ function Register() {
       onSubmit={e => {
         e.preventDefault()
         setQuery(store.mutateRegister({ email, password }))
-        console.log(email, password)
       }}
     >
       <div>

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { useQuery, StoreContext } from '../models'
 import Error from '../components/Error'
 import { observer } from 'mobx-react-lite'
@@ -13,39 +13,42 @@ function Login() {
 
   const store = useContext(StoreContext)
 
-  useEffect(() => {
-    if (data) setTimeout(store.view.openHomepage, 5000)
-  }, [data, store.view.openHomepage])
-
-  return (
-    <form
-      onSubmit={e => {
-        e.preventDefault()
-        setQuery(store.mutateLogin({ email, password }))
-        console.log(email, password)
-      }}
-    >
+  if (store.loggedInUser)
+    return (
       <div>
-        <input
-          value={email}
-          onChange={e => setEmail(e.target.value)}
-          placeholder="email"
-        ></input>
+        <button onClick={() => store.logout()}>Log Out</button>
       </div>
-      <div>
-        <input
-          value={password}
-          onChange={e => setPassword(e.target.value)}
-          placeholder="password"
-          type="password"
-        ></input>
-      </div>
-      <button type="submit">Login</button>
-      {loading && <p>Trying to log in again...</p>}
-      {error && <Error error={error} />}
-      {data && 'Logged in... ' + JSON.stringify(data)}
-    </form>
-  )
+    )
+  else
+    return (
+      <form
+        onSubmit={e => {
+          e.preventDefault()
+          setQuery(store.login({ email, password }))
+        }}
+      >
+        <div>
+          <input
+            autoFocus
+            value={email}
+            onChange={e => setEmail(e.target.value)}
+            placeholder="email"
+          ></input>
+        </div>
+        <div>
+          <input
+            value={password}
+            onChange={e => setPassword(e.target.value)}
+            placeholder="password"
+            type="password"
+          ></input>
+        </div>
+        <button type="submit">Login</button>
+        {loading && <p>Trying to log in again...</p>}
+        {error && <Error error={error} />}
+        {data && 'Logged in... ' + JSON.stringify(data)}
+      </form>
+    )
 }
 
 export default observer(Login)
