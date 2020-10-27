@@ -4,7 +4,7 @@ import App from './App'
 
 import { createHttpClient } from 'mst-gql'
 import { RootStore, StoreContext } from './models'
-import { reaction } from 'mobx'
+import { reaction, when } from 'mobx'
 import { routeMap, createRouter } from './models/view'
 
 const gqlHttpClient = createHttpClient('http://localhost:4000/graphql', {
@@ -62,5 +62,8 @@ reaction(
 
 reaction(
   () => rootStore.loggedInUser?.isTokenValid,
-  () => rootStore.loggedInUser?.refreshToken()
+  () => {
+    if (!rootStore.loggedInUser?.isTokenValid)
+      rootStore.loggedInUser?.refreshToken()
+  }
 )

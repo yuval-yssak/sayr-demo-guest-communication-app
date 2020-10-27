@@ -81,7 +81,7 @@ class UserResolver {
     const accessToken = createAccessToken(user)
     const refreshToken = createRefreshToken(user)
 
-    res.cookie('rx', refreshToken, { httpOnly: true })
+    res.cookie('rx', refreshToken, { httpOnly: true, path: '/refresh-token' })
 
     return { accessToken, user }
   }

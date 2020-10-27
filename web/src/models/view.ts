@@ -1,4 +1,5 @@
-import { types } from 'mobx-state-tree'
+import { types, getParent } from 'mobx-state-tree'
+import { RootStoreType } from './RootStore'
 // @ts-ignore
 import route from 'path-match'
 
@@ -30,7 +31,7 @@ const viewModel = types.optional(
       openLoginPage: () => (self.page = '/login'),
       openSecretPage: () => (self.page = '/secret')
     })),
-  { page: '/' }
+  { page: window.location.pathname }
 )
 
 interface IRoutes {

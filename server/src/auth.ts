@@ -66,7 +66,10 @@ async function exchangeToken(req: Request, res: Response): Promise<void> {
         if (user) {
           if (user.tokenVersion! === payload.tokenVersion) {
             const newExchangeToken = createRefreshToken(user)
-            res.cookie('rx', newExchangeToken, { httpOnly: true })
+            res.cookie('rx', newExchangeToken, {
+              httpOnly: true,
+              path: '/refresh-token'
+            })
             res.send({ ok: true, accessToken: createAccessToken(user) })
             return
           }

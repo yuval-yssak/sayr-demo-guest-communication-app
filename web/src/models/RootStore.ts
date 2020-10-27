@@ -1,4 +1,4 @@
-import { Instance, destroy, flow } from 'mobx-state-tree'
+import { Instance, destroy } from 'mobx-state-tree'
 import { RootStoreBase } from './RootStore.base'
 import viewModel from './view'
 import loggedInUser from './loggedInUser'
@@ -38,4 +38,4 @@ export const RootStore = RootStoreBase.props({
       self.loggedInUser && destroy(self.loggedInUser)
     }
   }))
-  .extend(localStorageMixin({ filter: ['loggedInUser'] }))
+  .extend(localStorageMixin({ filter: ['loggedInUser', 'userTypes'] }))
