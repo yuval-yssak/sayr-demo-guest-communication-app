@@ -4,7 +4,7 @@ import App from './App'
 
 import { createHttpClient } from 'mst-gql'
 import { RootStore, StoreContext } from './models'
-import { reaction, when } from 'mobx'
+import { reaction } from 'mobx'
 import { routeMap, createRouter } from './models/view'
 
 const gqlHttpClient = createHttpClient('http://localhost:4000/graphql', {
@@ -44,7 +44,6 @@ reaction(
     gqlHttpClient.setHeaders({
       authentication: accessToken ? `bearer ${accessToken}` : ''
     })
-    if (accessToken) rootStore.view.openHomepage()
   }
 )
 
@@ -56,16 +55,12 @@ window.onpopstate = function historyChange(ev: PopStateEvent) {
 
 router(window.location.pathname)
 
-when(
-  () => !!rootStore.loggedInUser,
-  () => {
-    // runs once after full page refresh, once the logged in user is retreived from local storage
-    if (rootStore.loggedInUser)
-      fetch('http://localhost:4000/refresh-token', {
-        method: 'POST',
-        credentials: 'include'
-      })
-        .then(response => response.json())
-        .then(json => rootStore.loggedInUser?.setAccessToken(json.accessToken))
-  }
+reaction(
+  () => rootStore.view.page,
+  page => console.log(page)
+)
+
+reaction(
+  () => rootStore.loggedInUser?.isTokenValid,
+  () => rootStore.loggedInUser?.refreshToken()
 )

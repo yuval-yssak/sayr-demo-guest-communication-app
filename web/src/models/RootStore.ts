@@ -20,14 +20,16 @@ export const RootStore = RootStoreBase.props({
       const query = self.mutateLogin({ email, password }, s =>
         s.accessToken.user()
       )
-      query.then(
-        data =>
-          (self.loggedInUser = loggedInUser.create({
-            accessToken: data.login.accessToken!,
-            id: data.login.user.id
-          })),
-        error => console.error(error)
-      )
+      query
+        .then(
+          data =>
+            (self.loggedInUser = loggedInUser.create({
+              accessToken: data.login.accessToken!,
+              id: data.login.user.id
+            })),
+          error => console.error(error)
+        )
+        .then(() => self.view.openHomepage())
       return query
     },
 
