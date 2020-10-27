@@ -1,14 +1,18 @@
 import { types, flow } from 'mobx-state-tree'
 import jwtDecode from 'jwt-decode'
 import { now } from 'mobx-utils'
+import { UserTypeModel } from './UserTypeModel'
 
 const loggedInUser = types.maybeNull(
   types
     .model('loggedInUser', {
-      id: types.identifier,
+      user: types.reference(UserTypeModel),
       accessToken: types.string
     })
     .views(self => ({
+      get id() {
+        return self.user.id
+      },
       get isTokenValid() {
         const { exp } = jwtDecode(self.accessToken)
 

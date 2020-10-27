@@ -25,7 +25,7 @@ export const RootStore = RootStoreBase.props({
           data =>
             (self.loggedInUser = loggedInUser.create({
               accessToken: data.login.accessToken!,
-              id: data.login.user.id
+              user: data.login.user.id
             })),
           error => console.error(error)
         )
