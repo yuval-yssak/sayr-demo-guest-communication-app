@@ -1,4 +1,4 @@
-import express from 'express'
+import express, { Request, Response } from 'express'
 import 'reflect-metadata'
 import { ApolloServer } from 'apollo-server-express'
 import { buildSchema } from 'type-graphql'
@@ -7,6 +7,8 @@ import { loadDataAccess } from './loaders/mainLoader'
 import cookieParser from 'cookie-parser'
 import { exchangeToken } from './auth'
 import cors from 'cors'
+import passport from 'passport'
+import { Strategy as GoogleStrategy } from 'passport-google-oauth20'
 
 const app = express()
 app.use(cookieParser())
@@ -33,3 +35,42 @@ async function start() {
 }
 
 start()
+
+passport.use(
+  new GoogleStrategy(
+    {
+      clientID:
+        '1053321495897-vgj5hu2dqo1utpps5mqnrt0tfn160955.apps.googleusercontent.com',
+      clientSecret: '33dKswmH65gXmZCWm10e_r42',
+      callbackURL: 'http://localhost:4000/cb'
+    },
+    function (
+      accessToken: string,
+      refreshToken: string,
+      profile: any,
+      cb: Function
+    ) {
+      console.log('in callback???', accessToken, refreshToken, profile, cb)
+      cb(null, profile)
+      // User.findOrCreate({ googleId: profile.id }, function (err, user) {
+      //   return cb(err, user);
+      // });
+    }
+  )
+)
+
+app.get(
+  '/login-with-google',
+  passport.authenticate('google', { scope: ['profile', 'email'] })
+)
+
+app.get(
+  '/cb',
+  passport.authenticate('google', { session: false }),
+  (_req: Request, res: Response) => {
+    console.log('auth good')
+    res.send('auth Good!!!')
+  }
+)
+
+app.use(passport.initialize())
