@@ -48,6 +48,8 @@ class UserResolver {
     @Arg('email') email: string,
     @Arg('password') password: string
   ) {
+    // todo: handle case when user logged in previously only with oauth.
+
     const hashedPassword = await hash(password, 10)
 
     try {
@@ -81,7 +83,10 @@ class UserResolver {
     const accessToken = createAccessToken(user)
     const refreshToken = createRefreshToken(user)
 
-    res.cookie('rx', refreshToken, { httpOnly: true, path: '/refresh-token' })
+    res.cookie('rx', refreshToken, {
+      // httpOnly: true,
+      // path: '/refresh-token'
+    })
 
     return { accessToken, user }
   }
@@ -90,6 +95,24 @@ class UserResolver {
   logout(@Ctx() { res }: MyContext): Boolean {
     res.clearCookie('rx')
     return true
+  }
+
+  @Mutation(() => LoginResponse)
+  async finishLoginWithGoogle(@Ctx() { req, res }: MyContext) {
+    console.log('in server mutation, ', req.user, req.session)
+    const user: UserType = req.session?.user
+
+    const accessToken = createAccessToken(user)
+    const refreshToken = createRefreshToken(user)
+
+    res.cookie('rx', refreshToken, {
+      // httpOnly: true,
+      // path: '/refresh-token'
+    })
+    console.log('seeeetting rx cookie ', refreshToken)
+    // const user = req.session!.googleProfile
+
+    return { accessToken, user }
   }
 
   @Mutation(() => Boolean)

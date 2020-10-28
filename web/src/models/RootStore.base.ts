@@ -41,6 +41,7 @@ export enum RootStoreBaseMutations {
   mutateRegister = 'mutateRegister',
   mutateLogin = 'mutateLogin',
   mutateLogout = 'mutateLogout',
+  mutateFinishLoginWithGoogle = 'mutateFinishLoginWithGoogle',
   mutateRevokeRefreshTokensForUser = 'mutateRevokeRefreshTokensForUser'
 }
 
@@ -135,6 +136,27 @@ export const RootStoreBase = withTypedRefs<Refs>()(
       mutateLogout(variables?: {}, optimisticUpdate?: () => void) {
         return self.mutate<{ logout: boolean }>(
           `mutation logout { logout }`,
+          variables,
+          optimisticUpdate
+        )
+      },
+      mutateFinishLoginWithGoogle(
+        variables?: {},
+        resultSelector:
+          | string
+          | ((
+              qb: LoginResponseModelSelector
+            ) => LoginResponseModelSelector) = loginResponseModelPrimitives.toString(),
+        optimisticUpdate?: () => void
+      ) {
+        return self.mutate<{ finishLoginWithGoogle: LoginResponseModelType }>(
+          `mutation finishLoginWithGoogle { finishLoginWithGoogle {
+        ${
+          typeof resultSelector === 'function'
+            ? resultSelector(new LoginResponseModelSelector()).toString()
+            : resultSelector
+        }
+      } }`,
           variables,
           optimisticUpdate
         )

@@ -13,10 +13,15 @@ const loggedInUser = types.maybeNull(
       get id() {
         return self.user.id
       },
-      get isTokenValid() {
+      isTokenValidWithMargin(gapInMilliseconds: number) {
         const { exp } = jwtDecode(self.accessToken)
 
-        return exp && now() < exp * 1000
+        return exp && now() + gapInMilliseconds < exp * 1000
+      }
+    }))
+    .views(self => ({
+      get isTokenValid() {
+        return self.isTokenValidWithMargin(0)
       }
     }))
     .actions(self => ({

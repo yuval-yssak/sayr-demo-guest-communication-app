@@ -33,6 +33,10 @@ export const RootStore = RootStoreBase.props({
       return query
     },
 
+    loginWithGoogle() {
+      window.location.replace('http://localhost:4000/login-with-google')
+    },
+
     logout() {
       self.mutateLogout()
       self.loggedInUser && destroy(self.loggedInUser)

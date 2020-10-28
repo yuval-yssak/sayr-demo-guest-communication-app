@@ -23,6 +23,8 @@ class UserType {
   password: string
 
   tokenVersion: number
+
+  googleProfile: any
 }
 
 interface LoginPayload {
@@ -53,22 +55,24 @@ function createRefreshToken(user: UserType): string {
 async function exchangeToken(req: Request, res: Response): Promise<void> {
   try {
     const token = req.cookies.rx as string
-
+    console.log('in exchange token, ', token)
     if (token) {
       let payload: LoginPayload
       payload = verify(token, jwt.secretKeyForRefresh) as LoginPayload
 
       if (payload) {
+        console.log('payload, ', payload)
         const user = (
           await usersDao.findArray({ _id: new ObjectID(payload.userId) })
         )?.[0]
 
         if (user) {
+          console.log('user ', user)
           if (user.tokenVersion! === payload.tokenVersion) {
             const newExchangeToken = createRefreshToken(user)
             res.cookie('rx', newExchangeToken, {
-              httpOnly: true,
-              path: '/refresh-token'
+              // httpOnly: true,
+              // path: '/refresh-token'
             })
             res.send({ ok: true, accessToken: createAccessToken(user) })
             return

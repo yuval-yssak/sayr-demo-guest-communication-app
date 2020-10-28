@@ -1,5 +1,4 @@
-import { types, getParent } from 'mobx-state-tree'
-import { RootStoreType } from './RootStore'
+import { types } from 'mobx-state-tree'
 // @ts-ignore
 import route from 'path-match'
 
