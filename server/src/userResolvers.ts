@@ -84,8 +84,8 @@ class UserResolver {
     const refreshToken = createRefreshToken(user)
 
     res.cookie('rx', refreshToken, {
-      // httpOnly: true,
-      // path: '/refresh-token'
+      httpOnly: true,
+      path: '/refresh-token'
     })
 
     return { accessToken, user }
@@ -106,10 +106,10 @@ class UserResolver {
     const refreshToken = createRefreshToken(user)
 
     res.cookie('rx', refreshToken, {
-      // httpOnly: true,
-      // path: '/refresh-token'
+      httpOnly: true,
+      path: '/refresh-token'
     })
-    console.log('seeeetting rx cookie ', refreshToken)
+    console.log('setting rx cookie ', refreshToken)
     // const user = req.session!.googleProfile
 
     return { accessToken, user }

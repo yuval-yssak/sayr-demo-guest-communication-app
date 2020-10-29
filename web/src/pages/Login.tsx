@@ -54,11 +54,7 @@ function Login() {
         <GoogleLogin onClick={() => store.loginWithGoogle()} />
         <button
           onClick={() => {
-            const a = store.mutateFinishLoginWithGoogle()
-            a.then(
-              data => console.log(JSON.stringify(data.finishLoginWithGoogle)),
-              console.error
-            )
+            store.finishGoogleLogin()
           }}
         >
           Click me after login with google

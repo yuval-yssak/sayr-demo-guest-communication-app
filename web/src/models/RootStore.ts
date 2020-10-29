@@ -1,8 +1,9 @@
-import { Instance, destroy } from 'mobx-state-tree'
+import { Instance, destroy, flow } from 'mobx-state-tree'
 import { RootStoreBase } from './RootStore.base'
 import viewModel from './view'
 import loggedInUser from './loggedInUser'
 import { localStorageMixin } from 'mst-gql'
+import { LoginResponseModelType } from '.'
 
 export interface RootStoreType extends Instance<typeof RootStore.Type> {}
 
@@ -36,6 +37,18 @@ export const RootStore = RootStoreBase.props({
     loginWithGoogle() {
       window.location.replace('http://localhost:4000/login-with-google')
     },
+
+    finishGoogleLogin: flow(function* () {
+      const query: {
+        finishLoginWithGoogle: LoginResponseModelType
+      } = yield self.mutateFinishLoginWithGoogle({}, s => s.accessToken.user())
+        .promise
+
+      self.loggedInUser = loggedInUser.create({
+        accessToken: query.finishLoginWithGoogle.accessToken!,
+        user: query.finishLoginWithGoogle.user.id
+      })
+    }),
 
     logout() {
       self.mutateLogout()
