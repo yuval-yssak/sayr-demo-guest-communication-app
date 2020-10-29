@@ -14,7 +14,7 @@ import usersDAO from './dao/usersDAO'
 import { MyContext } from './MyContext'
 import { UserType, createAccessToken, createRefreshToken } from './auth'
 import { isAuth } from './isAuth'
-import { ObjectID } from 'mongodb'
+import { ObjectId } from 'mongodb'
 
 @ObjectType()
 class LoginResponse {
@@ -51,13 +51,21 @@ class UserResolver {
     // todo: handle case when user logged in previously only with oauth.
 
     const hashedPassword = await hash(password, 10)
+    const user: UserType = (await usersDAO.findArray({ email }))?.[0]
 
     try {
-      await usersDAO.insertOne({
-        email,
-        password: hashedPassword,
-        tokenVersion: 0
-      })
+      if (user) {
+        await usersDAO.updateOne(
+          { _id: new ObjectId(user._id) },
+          { $set: { password: hashedPassword } }
+        )
+      } else {
+        await usersDAO.insertOne({
+          email,
+          password: hashedPassword,
+          tokenVersion: 0
+        })
+      }
     } catch (e) {
       console.error(e)
       return false
@@ -77,7 +85,11 @@ class UserResolver {
 
     if (!user) throw new Error('could not find user ' + email)
 
-    const valid: boolean = await compare(password, user.password)
+    let valid: boolean = false
+    try {
+      valid = await compare(password, user.password)
+    } catch {}
+
     if (!valid) throw new Error('wrong password')
 
     const accessToken = createAccessToken(user)
@@ -116,10 +128,10 @@ class UserResolver {
   }
 
   @Mutation(() => Boolean)
-  async revokeRefreshTokensForUser(@Arg('userId', () => ID) userId: ObjectID) {
+  async revokeRefreshTokensForUser(@Arg('userId', () => ID) userId: ObjectId) {
     console.log(arguments)
     await usersDAO.updateOne(
-      { _id: new ObjectID(userId) },
+      { _id: new ObjectId(userId) },
       { $inc: { tokenVersion: 1 } as any }
     )
     return true
