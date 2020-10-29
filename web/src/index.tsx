@@ -5,7 +5,7 @@ import App from './App'
 import { createHttpClient } from 'mst-gql'
 import { RootStore, StoreContext } from './models'
 import { reaction } from 'mobx'
-import { routeMap, createRouter } from './models/view'
+import { createRouter } from './models/view'
 
 const gqlHttpClient = createHttpClient('http://localhost:4000/graphql', {
   credentials: 'include',
@@ -47,7 +47,7 @@ reaction(
   }
 )
 
-const router = createRouter(routeMap(rootStore.view))
+const router = createRouter(rootStore.view)
 
 window.onpopstate = function historyChange(ev: PopStateEvent) {
   if (ev.type === 'popstate') router(window.location.pathname)

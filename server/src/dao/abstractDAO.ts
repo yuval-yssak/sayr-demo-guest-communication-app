@@ -16,7 +16,7 @@ class abstractDAO {
     this.databaseName = dbName
     this.dbClient = client
 
-    const existingCollections: Array<Collection<any>> = await this.dbClient
+    const existingCollections: Array<Collection> = await this.dbClient
       .db(dbName)
       .collections()
 

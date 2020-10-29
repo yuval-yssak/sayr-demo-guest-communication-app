@@ -1,4 +1,4 @@
-import { types } from 'mobx-state-tree'
+import { Instance, types, getRoot } from 'mobx-state-tree'
 // @ts-ignore
 import route from 'path-match'
 
@@ -28,28 +28,35 @@ const viewModel = types.optional(
       openHomepage: () => (self.page = '/'),
       openRegisterPage: () => (self.page = '/register'),
       openLoginPage: () => (self.page = '/login'),
-      openSecretPage: () => (self.page = '/secret')
+      openSecretPage: () => (self.page = '/secret'),
+      handleGoogleLoginSuccess() {
+        const root: any = getRoot(self)
+        root.finishGoogleLogin()
+      }
     })),
   { page: window.location.pathname }
 )
+
+export interface ViewModelInterface extends Instance<typeof viewModel> {}
 
 interface IRoutes {
   [routeName: string]: Function
 }
 
 // todo: DRY
-const routeMap: (view: any) => IRoutes = view => ({
+const routeMap: (view: ViewModelInterface) => IRoutes = view => ({
   '/': view.openHomepage,
   '/register': view.openRegisterPage,
   '/login': () => view.openLoginPage(),
-  '/secret': () => view.openSecretPage()
+  '/secret': () => view.openSecretPage(),
+  '/after-google-login': () => view.handleGoogleLoginSuccess()
 })
 
-function createRouter(routes: IRoutes) {
-  const matchers = Object.keys(routes).map(path => [
-    route()(path),
-    routes[path]
-  ])
+function createRouterInner(routes: IRoutes) {
+  const matchers: Array<[Function, Function]> = Object.keys(
+    routes
+  ).map(path => [route()(path), routes[path]])
+
   return function (path: string) {
     return matchers.some(([matcher, f]) => {
       const result = matcher(path)
@@ -60,4 +67,7 @@ function createRouter(routes: IRoutes) {
   }
 }
 
-export { routeMap, createRouter, viewModel as default }
+const createRouter = (view: ViewModelInterface) =>
+  createRouterInner(routeMap(view))
+
+export { createRouter, viewModel as default }

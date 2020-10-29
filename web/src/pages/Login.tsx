@@ -23,7 +23,6 @@ function Login() {
   else
     return (
       <>
-        {' '}
         <form
           onSubmit={e => {
             e.preventDefault()
@@ -52,13 +51,6 @@ function Login() {
           {data && 'Logged in... ' + JSON.stringify(data)}
         </form>
         <GoogleLogin onClick={() => store.loginWithGoogle()} />
-        <button
-          onClick={() => {
-            store.finishGoogleLogin()
-          }}
-        >
-          Click me after login with google
-        </button>
       </>
     )
 }

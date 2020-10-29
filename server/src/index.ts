@@ -144,7 +144,7 @@ app.get(
     req.session!.user = req.user
     req.session!.cookie.maxAge = 1000 * 10 * 60
 
-    res.redirect('http://localhost:3000/login')
+    res.redirect('http://localhost:3000/after-google-login')
   }
 )
 

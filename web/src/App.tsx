@@ -6,8 +6,9 @@ import Register from './pages/Register'
 import Login from './pages/Login'
 import Header from './components/Header'
 import Secret from './pages/Secret'
+import { ViewModelInterface } from './models/view'
 
-function renderPage(view: any) {
+function renderPage(view: ViewModelInterface) {
   switch (view.page) {
     case '/':
       return <Home />

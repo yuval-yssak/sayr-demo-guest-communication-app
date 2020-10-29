@@ -131,8 +131,8 @@ class UserResolver {
   async revokeRefreshTokensForUser(@Arg('userId', () => ID) userId: ObjectId) {
     console.log(arguments)
     await usersDAO.updateOne(
-      { _id: new ObjectId(userId) },
-      { $inc: { tokenVersion: 1 } as any }
+      { id: new ObjectId(userId) },
+      { $inc: { accessToken: 1 as any } }
     )
     return true
   }

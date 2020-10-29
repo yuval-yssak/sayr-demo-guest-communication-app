@@ -39,15 +39,22 @@ export const RootStore = RootStoreBase.props({
     },
 
     finishGoogleLogin: flow(function* () {
-      const query: {
-        finishLoginWithGoogle: LoginResponseModelType
-      } = yield self.mutateFinishLoginWithGoogle({}, s => s.accessToken.user())
-        .promise
+      try {
+        const query: {
+          finishLoginWithGoogle: LoginResponseModelType
+        } = yield self.mutateFinishLoginWithGoogle({}, s =>
+          s.accessToken.user()
+        ).promise
 
-      self.loggedInUser = loggedInUser.create({
-        accessToken: query.finishLoginWithGoogle.accessToken!,
-        user: query.finishLoginWithGoogle.user.id
-      })
+        self.loggedInUser = loggedInUser.create({
+          accessToken: query.finishLoginWithGoogle.accessToken!,
+          user: query.finishLoginWithGoogle.user.id
+        })
+      } catch (e) {
+        console.error(e)
+      } finally {
+        self.view.openHomepage()
+      }
     }),
 
     logout() {
