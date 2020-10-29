@@ -12,6 +12,7 @@ import { Strategy as GoogleStrategy } from 'passport-google-oauth20'
 import session from 'express-session'
 import usersDAO from './dao/usersDAO'
 import { ObjectId } from 'mongodb'
+import { CalendarResolver } from './calendarResolver'
 
 const app = express()
 app.use(cookieParser())
@@ -38,7 +39,7 @@ async function start() {
   await loadDataAccess()
 
   const apolloServer = new ApolloServer({
-    schema: await buildSchema({ resolvers: [UserResolver] }),
+    schema: await buildSchema({ resolvers: [UserResolver, CalendarResolver] }),
     context: ({ req, res }) => ({ req, res })
   })
 
@@ -70,7 +71,10 @@ passport.use(
         })
       )?.[0]
 
-      if (user && !user.googleProfile) {
+      if (
+        user
+        // && !user.googleProfile
+      ) {
         usersDAO.updateOne(
           { _id: new ObjectId(user._id) },
           { $set: { googleProfile: { ...profile, accessToken, refreshToken } } }
@@ -103,7 +107,26 @@ app.get(
   '/login-with-google',
   passport.authenticate('google', {
     scope: ['profile', 'email'],
-    accessType: 'offline'
+    accessType: 'offline',
+    includeGrantedScopes: true
+  })
+)
+
+app.get(
+  '/google/AllowCalendar',
+  passport.authenticate('google', {
+    scope: ['https://www.googleapis.com/auth/calendar.events'],
+    accessType: 'offline',
+    includeGrantedScopes: true
+  })
+)
+
+app.get(
+  '/google/AllowDrive',
+  passport.authenticate('google', {
+    scope: ['https://www.googleapis.com/auth/drive'],
+    accessType: 'offline',
+    includeGrantedScopes: true
   })
 )
 
