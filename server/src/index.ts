@@ -27,7 +27,11 @@ app.use(
     secret: 'my-secret',
     name: 'the-cookie',
     resave: false,
-    saveUninitialized: false
+    saveUninitialized: false,
+    cookie: {
+      maxAge: 1000 * 5, // cookie should die after client first redirect
+      secure: process.env.NODE_ENV === 'production'
+    }
   })
 )
 
@@ -142,7 +146,6 @@ app.get(
     // return { accessToken, user }
 
     req.session!.user = req.user
-    req.session!.cookie.maxAge = 1000 * 10 * 60
 
     res.redirect('http://localhost:3000/after-google-login')
   }

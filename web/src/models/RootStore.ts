@@ -57,9 +57,16 @@ export const RootStore = RootStoreBase.props({
       }
     }),
 
-    logout() {
+    logoutAction() {
+      console.log('logging out')
       self.mutateLogout()
       self.loggedInUser && destroy(self.loggedInUser)
+    }
+  }))
+  .actions(self => ({
+    logout() {
+      self.logoutAction()
+      // BroadcastMessageToAllTabs('logout-event', 'logout')
     }
   }))
   .extend(localStorageMixin({ filter: ['loggedInUser', 'userTypes'] }))

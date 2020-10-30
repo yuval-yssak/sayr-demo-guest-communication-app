@@ -61,19 +61,22 @@ async function exchangeToken(req: Request, res: Response): Promise<void> {
       payload = verify(token, jwt.secretKeyForRefresh) as LoginPayload
 
       if (payload) {
-        console.log('payload, ', payload)
+        // console.log('payload, ', payload)
         const user = (
           await usersDao.findArray({ _id: new ObjectID(payload.userId) })
         )?.[0]
 
         if (user) {
-          console.log('user ', user)
+          // console.log('user ', user)
           if (user.tokenVersion! === payload.tokenVersion) {
             const newExchangeToken = createRefreshToken(user)
             res.cookie('rx', newExchangeToken, {
               httpOnly: true,
-              path: '/refresh-token'
+              path: '/refresh-token',
+              maxAge: 1000 * 60 * 60 * 24 * 7,
+              secure: process.env.NODE_ENV === 'production'
             })
+
             res.send({ ok: true, accessToken: createAccessToken(user) })
             return
           }

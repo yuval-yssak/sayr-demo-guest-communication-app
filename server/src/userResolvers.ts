@@ -97,7 +97,9 @@ class UserResolver {
 
     res.cookie('rx', refreshToken, {
       httpOnly: true,
-      path: '/refresh-token'
+      path: '/refresh-token',
+      maxAge: 1000 * 60 * 60 * 24 * 7,
+      secure: process.env.NODE_ENV === 'production'
     })
 
     return { accessToken, user }
@@ -105,7 +107,16 @@ class UserResolver {
 
   @Mutation(() => Boolean)
   logout(@Ctx() { res }: MyContext): Boolean {
-    res.clearCookie('rx')
+    console.log('logging out')
+
+    res.clearCookie('rx', {
+      httpOnly: true,
+      path: '/refresh-token',
+      domain: 'http://localhost:3000',
+      secure: process.env.NODE_ENV === 'production'
+    })
+
+    console.log('cookie cleared')
     return true
   }
 
@@ -119,7 +130,9 @@ class UserResolver {
 
     res.cookie('rx', refreshToken, {
       httpOnly: true,
-      path: '/refresh-token'
+      path: '/refresh-token',
+      maxAge: 1000 * 60 * 60 * 24 * 7,
+      secure: process.env.NODE_ENV === 'production'
     })
     console.log('setting rx cookie ', refreshToken)
     // const user = req.session!.googleProfile
