@@ -2,7 +2,10 @@ import { Instance, types, getRoot } from 'mobx-state-tree'
 // @ts-ignore
 import route from 'path-match'
 
-const viewModel = types.optional(
+/* The TypeScript type of an instance of ViewModel */
+export interface ViewModelType extends Instance<typeof ViewModel.Type> {}
+
+const ViewModel = types.optional(
   types
     .model({
       page: '',
@@ -30,21 +33,18 @@ const viewModel = types.optional(
       openLoginPage: () => (self.page = '/login'),
       openSecretPage: () => (self.page = '/secret'),
       handleGoogleLoginSuccess() {
-        const root: any = getRoot(self)
-        root.finishGoogleLogin()
+        getRoot<any>(self).finishGoogleLogin()
       }
     })),
   { page: window.location.pathname }
 )
-
-export interface ViewModelInterface extends Instance<typeof viewModel> {}
 
 interface IRoutes {
   [routeName: string]: Function
 }
 
 // todo: DRY
-const routeMap: (view: ViewModelInterface) => IRoutes = view => ({
+const routeMap: (view: ViewModelType) => IRoutes = view => ({
   '/': view.openHomepage,
   '/register': view.openRegisterPage,
   '/login': () => view.openLoginPage(),
@@ -67,7 +67,6 @@ function createRouterInner(routes: IRoutes) {
   }
 }
 
-const createRouter = (view: ViewModelInterface) =>
-  createRouterInner(routeMap(view))
+const createRouter = (view: ViewModelType) => createRouterInner(routeMap(view))
 
-export { createRouter, viewModel as default }
+export { createRouter, ViewModel as default }

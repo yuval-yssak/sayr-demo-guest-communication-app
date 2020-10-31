@@ -143,7 +143,7 @@ class UserResolver {
     console.log(arguments)
     await usersDAO.updateOne(
       { id: new ObjectId(userId) },
-      { $inc: { accessToken: 1 as any } }
+      { $inc: { accessToken: 1 } }
     )
     return true
   }

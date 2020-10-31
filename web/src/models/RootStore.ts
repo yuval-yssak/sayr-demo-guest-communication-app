@@ -1,6 +1,6 @@
 import { Instance, destroy, flow, SnapshotOrInstance } from 'mobx-state-tree'
 import { RootStoreBase } from './RootStore.base'
-import viewModel from './view'
+import ViewModel from './view'
 import loggedInUser from './loggedInUser'
 import { localStorageMixin } from 'mst-gql'
 import { LoginResponseModelType } from '.'
@@ -8,7 +8,7 @@ import { LoginResponseModelType } from '.'
 export interface RootStoreType extends Instance<typeof RootStore.Type> {}
 
 export const RootStore = RootStoreBase.props({
-  view: viewModel,
+  view: ViewModel,
   loggedInUser
 })
   .actions(self => ({
