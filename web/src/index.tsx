@@ -6,7 +6,6 @@ import { createHttpClient } from 'mst-gql'
 import { RootStore, RootStoreType, StoreContext } from './models'
 import { reaction } from 'mobx'
 import { createRouter } from './models/view'
-import { applySnapshot } from 'mobx-state-tree'
 
 const gqlHttpClient = createHttpClient('http://localhost:4000/graphql', {
   credentials: 'include',
@@ -70,7 +69,7 @@ reaction(
 )
 
 // synchronize login and logout on all tabs
-// relying on the localStorageMixin.
+// relying on the localStorageMixin to update the "loggedInUser"
 window.addEventListener('storage', (e: StorageEvent) => {
   if (e.key === 'mst-gql-rootstore') {
     const storageOldValue: RootStoreType = JSON.parse(e.oldValue || '{}')
@@ -84,7 +83,7 @@ window.addEventListener('storage', (e: StorageEvent) => {
         storageNewValue?.loggedInUser &&
         !rootStore.loggedInUser)
     ) {
-      applySnapshot(rootStore, storageNewValue as any)
+      rootStore.setLoggedInUser(storageNewValue.loggedInUser)
     }
   }
 })

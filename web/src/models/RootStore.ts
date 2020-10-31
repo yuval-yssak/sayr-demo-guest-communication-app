@@ -1,4 +1,4 @@
-import { Instance, destroy, flow } from 'mobx-state-tree'
+import { Instance, destroy, flow, SnapshotOrInstance } from 'mobx-state-tree'
 import { RootStoreBase } from './RootStore.base'
 import viewModel from './view'
 import loggedInUser from './loggedInUser'
@@ -15,6 +15,15 @@ export const RootStore = RootStoreBase.props({
     // This is an auto-generated example action.
     log() {
       console.log(JSON.stringify(self))
+    },
+
+    setLoggedInUser(input: SnapshotOrInstance<typeof self.loggedInUser>) {
+      self.loggedInUser = input
+        ? loggedInUser.create({
+            accessToken: input.accessToken,
+            user: input.user.toString()
+          })
+        : null
     },
 
     login({ email, password }: { email: string; password: string }) {
@@ -51,25 +60,19 @@ export const RootStore = RootStoreBase.props({
           user: query.finishLoginWithGoogle.user.id
         })
       } catch (e) {
-        console.error(e)
+        console.error('error on "finishe google login", ', e)
       } finally {
         self.view.openHomepage()
       }
     }),
 
-    logoutAction() {
+    logout() {
       console.log('logging out')
       self.mutateLogout()
       self.loggedInUser && destroy(self.loggedInUser)
     }
   }))
-  .actions(self => ({
-    logout() {
-      self.logoutAction()
 
-      // BroadcastMessageToAllTabs('logout-event', 'logout')
-    }
-  }))
   .extend(
     localStorageMixin({ filter: ['loggedInUser', 'userTypes'], throttle: 2000 })
   )
