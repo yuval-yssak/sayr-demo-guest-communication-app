@@ -1,34 +1,29 @@
 import { ObjectType, Field, ID } from 'type-graphql'
-import { ObjectID } from 'mongodb'
+import { ObjectId } from 'mongodb'
 import { jwt } from '../../config/config'
 import { sign } from 'jsonwebtoken'
 
 import { Request, Response } from 'express'
 import 'reflect-metadata'
 import { verify } from 'jsonwebtoken'
-import usersDao from '../dao/usersDAO'
+import usersDao, { UserType } from '../dao/usersDAO'
 
 @ObjectType()
-class UserType {
-  _id: ObjectID
-
+class User {
   @Field(() => ID)
-  get id() {
-    return this._id
-  }
+  id: ObjectId
 
   @Field()
   email: string
 
-  password: string
-
-  tokenVersion: number
-
-  googleProfile: any
+  constructor(user: UserType) {
+    this.id = user._id
+    this.email = user.email
+  }
 }
 
 interface LoginPayload {
-  userId: ObjectID
+  userId: ObjectId
   tokenVersion: number
 }
 
@@ -63,7 +58,7 @@ async function exchangeToken(req: Request, res: Response): Promise<void> {
       if (payload) {
         // console.log('payload, ', payload)
         const user = (
-          await usersDao.findArray({ _id: new ObjectID(payload.userId) })
+          await usersDao.findArray({ _id: new ObjectId(payload.userId) })
         )?.[0]
 
         if (user) {
@@ -90,7 +85,7 @@ async function exchangeToken(req: Request, res: Response): Promise<void> {
   }
 }
 export {
-  UserType,
+  User,
   createAccessToken,
   createRefreshToken,
   LoginPayload,

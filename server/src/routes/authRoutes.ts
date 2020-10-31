@@ -35,7 +35,7 @@ const authRoutes = (app: Express) => {
   )
 
   app.get(
-    '/login-with-google/cb',
+    '/login-with-google/callback',
     passport.authenticate('google', { session: false }),
     (req: Request, res: Response) => {
       req.session!.user = req.user

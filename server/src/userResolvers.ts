@@ -10,9 +10,9 @@ import {
   UseMiddleware
 } from 'type-graphql'
 import { compare, hash } from 'bcryptjs'
-import usersDAO from './dao/usersDAO'
+import usersDAO, { UserType } from './dao/usersDAO'
 import { MyContext } from './MyContext'
-import { UserType, createAccessToken, createRefreshToken } from './auth/auth'
+import { User, createAccessToken, createRefreshToken } from './auth/auth'
 import { isAuth } from './auth/isAuth'
 import { ObjectId } from 'mongodb'
 
@@ -22,7 +22,7 @@ class LoginResponse {
   accessToken: string
 
   @Field()
-  user: UserType
+  user: User
 }
 
 @Resolver()
@@ -32,9 +32,10 @@ class UserResolver {
     return 'Hello world!!!!'
   }
 
-  @Query(() => [UserType])
+  @Query(() => [User])
   async users() {
-    return await usersDAO.findArray({})
+    const users = await usersDAO.findArray({})
+    return users.map(user => new User(user))
   }
 
   @Query(() => String)
@@ -49,7 +50,7 @@ class UserResolver {
     @Arg('password') password: string
   ) {
     const hashedPassword = await hash(password, 10)
-    const user: UserType = (await usersDAO.findArray({ email }))?.[0]
+    const user = (await usersDAO.findArray({ email }))?.[0]
 
     try {
       if (user) {
@@ -77,15 +78,13 @@ class UserResolver {
     @Arg('password') password: string,
     @Ctx() { res }: MyContext
   ): Promise<LoginResponse> {
-    const user: UserType | undefined = (
-      await usersDAO.findArray({ email })
-    )?.[0]
+    const user = (await usersDAO.findArray({ email }))?.[0]
 
     if (!user) throw new Error('could not find user ' + email)
 
     let valid: boolean = false
     try {
-      valid = await compare(password, user.password)
+      if (user.password) valid = await compare(password, user.password)
     } catch {}
 
     if (!valid) throw new Error('wrong password')
@@ -100,7 +99,7 @@ class UserResolver {
       secure: process.env.NODE_ENV === 'production'
     })
 
-    return { accessToken, user }
+    return { accessToken, user: new User(user) }
   }
 
   @Mutation(() => Boolean)
@@ -119,7 +118,9 @@ class UserResolver {
   }
 
   @Mutation(() => LoginResponse)
-  async finishLoginWithGoogle(@Ctx() { req, res }: MyContext) {
+  async finishLoginWithGoogle(
+    @Ctx() { req, res }: MyContext
+  ): Promise<LoginResponse> {
     console.log('in server mutation, ', req.user, req.session)
     const user: UserType = req.session?.user
 
@@ -133,9 +134,8 @@ class UserResolver {
       secure: process.env.NODE_ENV === 'production'
     })
     console.log('setting rx cookie ', refreshToken)
-    // const user = req.session!.googleProfile
 
-    return { accessToken, user }
+    return { accessToken, user: new User(user) }
   }
 
   @Mutation(() => Boolean)

@@ -5,13 +5,13 @@
 import { types } from 'mobx-state-tree'
 import { MSTGQLRef, QueryBuilder, withTypedRefs } from 'mst-gql'
 import { ModelBase } from './ModelBase'
-import { UserTypeModel, UserTypeModelType } from './UserTypeModel'
-import { UserTypeModelSelector } from './UserTypeModel.base'
+import { UserModel, UserModelType } from './UserModel'
+import { UserModelSelector } from './UserModel.base'
 import { RootStoreType } from './index'
 
 /* The TypeScript type that explicits the refs to other models in order to prevent a circular refs issue */
 type Refs = {
-  user: UserTypeModelType
+  user: UserModelType
 }
 
 /**
@@ -28,7 +28,7 @@ export const LoginResponseModelBase = withTypedRefs<Refs>()(
       accessToken: types.union(types.undefined, types.string),
       user: types.union(
         types.undefined,
-        MSTGQLRef(types.late((): any => UserTypeModel))
+        MSTGQLRef(types.late((): any => UserModel))
       )
     })
     .views(self => ({
@@ -45,10 +45,10 @@ export class LoginResponseModelSelector extends QueryBuilder {
   user(
     builder?:
       | string
-      | UserTypeModelSelector
-      | ((selector: UserTypeModelSelector) => UserTypeModelSelector)
+      | UserModelSelector
+      | ((selector: UserModelSelector) => UserModelSelector)
   ) {
-    return this.__child(`user`, UserTypeModelSelector, builder)
+    return this.__child(`user`, UserModelSelector, builder)
   }
 }
 export function selectFromLoginResponse() {

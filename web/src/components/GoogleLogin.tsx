@@ -1,7 +1,7 @@
 import React from 'react'
 import styled from 'styled-components'
 
-const GSignInButton = styled.div`
+const GSignInButton = styled.a`
   *,
   *:before,
   *:after {
@@ -63,7 +63,7 @@ const TextContainer = styled.span`
 `
 function GoogleLogin({ onClick }: { onClick: () => void }) {
   return (
-    <GSignInButton onClick={() => onClick()}>
+    <GSignInButton onClick={() => onClick()} href="#">
       <ContentWrapper>
         <LogoWrapper>
           <Img src="https://developers.google.com/identity/images/g-logo.png" />

@@ -1,6 +1,5 @@
 import { Resolver, Query, ObjectType, Field } from 'type-graphql'
 import usersDAO from './dao/usersDAO'
-import { UserType } from './auth/auth'
 import axios from 'axios'
 import { inspect } from 'util'
 
@@ -29,8 +28,8 @@ class CalendarResolver {
     try {
       const Authorization =
         'Bearer ' +
-        (await usersDAO.findArray({ email: 'iswara@sivananda.org' }))?.[0]
-          ?.googleProfile?.accessToken
+        (await usersDAO.findArray({ email: 'iswara@sivananda.org' }))?.[0].oauth
+          ?.google?.accessToken
       console.log('auth token ', Authorization)
       const response = await axios.get(
         'https://www.googleapis.com/calendar/v3/calendars/iswara@sivananda.org/events',
@@ -68,4 +67,4 @@ class CalendarResolver {
     }
   }
 }
-export { CalendarResolver, UserType }
+export { CalendarResolver }

@@ -10,11 +10,10 @@ import {
   withTypedRefs
 } from 'mst-gql'
 
-import { UserTypeModel, UserTypeModelType } from './UserTypeModel'
-import {
-  userTypeModelPrimitives,
-  UserTypeModelSelector
-} from './UserTypeModel.base'
+import { UserModel, UserModelType } from './UserModel'
+import { userModelPrimitives, UserModelSelector } from './UserModel.base'
+import { EventModel, EventModelType } from './EventModel'
+import { eventModelPrimitives, EventModelSelector } from './EventModel.base'
 import {
   LoginResponseModel,
   LoginResponseModelType
@@ -26,7 +25,7 @@ import {
 
 /* The TypeScript type that explicits the refs to other models in order to prevent a circular refs issue */
 type Refs = {
-  userTypes: ObservableMap<string, UserTypeModelType>
+  users: ObservableMap<string, UserModelType>
 }
 
 /**
@@ -35,7 +34,8 @@ type Refs = {
 export enum RootStoreBaseQueries {
   queryHello = 'queryHello',
   queryUsers = 'queryUsers',
-  queryTellASecret = 'queryTellASecret'
+  queryTellASecret = 'queryTellASecret',
+  queryGetEvents = 'queryGetEvents'
 }
 export enum RootStoreBaseMutations {
   mutateRegister = 'mutateRegister',
@@ -53,18 +53,16 @@ export const RootStoreBase = withTypedRefs<Refs>()(
     .extend(
       configureStoreMixin(
         [
-          ['UserType', () => UserTypeModel],
+          ['User', () => UserModel],
+          ['Event', () => EventModel],
           ['LoginResponse', () => LoginResponseModel]
         ],
-        ['UserType'],
+        ['User'],
         'js'
       )
     )
     .props({
-      userTypes: types.optional(
-        types.map(types.late((): any => UserTypeModel)),
-        {}
-      )
+      users: types.optional(types.map(types.late((): any => UserModel)), {})
     })
     .actions(self => ({
       queryHello(variables?: {}, options: QueryOptions = {}) {
@@ -79,15 +77,15 @@ export const RootStoreBase = withTypedRefs<Refs>()(
         resultSelector:
           | string
           | ((
-              qb: UserTypeModelSelector
-            ) => UserTypeModelSelector) = userTypeModelPrimitives.toString(),
+              qb: UserModelSelector
+            ) => UserModelSelector) = userModelPrimitives.toString(),
         options: QueryOptions = {}
       ) {
-        return self.query<{ users: UserTypeModelType[] }>(
+        return self.query<{ users: UserModelType[] }>(
           `query users { users {
         ${
           typeof resultSelector === 'function'
-            ? resultSelector(new UserTypeModelSelector()).toString()
+            ? resultSelector(new UserModelSelector()).toString()
             : resultSelector
         }
       } }`,
@@ -98,6 +96,27 @@ export const RootStoreBase = withTypedRefs<Refs>()(
       queryTellASecret(variables?: {}, options: QueryOptions = {}) {
         return self.query<{ tellASecret: string }>(
           `query tellASecret { tellASecret }`,
+          variables,
+          options
+        )
+      },
+      queryGetEvents(
+        variables?: {},
+        resultSelector:
+          | string
+          | ((
+              qb: EventModelSelector
+            ) => EventModelSelector) = eventModelPrimitives.toString(),
+        options: QueryOptions = {}
+      ) {
+        return self.query<{ getEvents: EventModelType[] }>(
+          `query getEvents { getEvents {
+        ${
+          typeof resultSelector === 'function'
+            ? resultSelector(new EventModelSelector()).toString()
+            : resultSelector
+        }
+      } }`,
           variables,
           options
         )

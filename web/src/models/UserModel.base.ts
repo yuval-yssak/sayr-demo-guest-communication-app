@@ -8,12 +8,12 @@ import { ModelBase } from './ModelBase'
 import { RootStoreType } from './index'
 
 /**
- * UserTypeBase
- * auto generated base class for the model UserTypeModel.
+ * UserBase
+ * auto generated base class for the model UserModel.
  */
-export const UserTypeModelBase = ModelBase.named('UserType')
+export const UserModelBase = ModelBase.named('User')
   .props({
-    __typename: types.optional(types.literal('UserType'), 'UserType'),
+    __typename: types.optional(types.literal('User'), 'User'),
     id: types.identifier,
     email: types.union(types.undefined, types.string)
   })
@@ -23,7 +23,7 @@ export const UserTypeModelBase = ModelBase.named('UserType')
     }
   }))
 
-export class UserTypeModelSelector extends QueryBuilder {
+export class UserModelSelector extends QueryBuilder {
   get id() {
     return this.__attr(`id`)
   }
@@ -31,8 +31,8 @@ export class UserTypeModelSelector extends QueryBuilder {
     return this.__attr(`email`)
   }
 }
-export function selectFromUserType() {
-  return new UserTypeModelSelector()
+export function selectFromUser() {
+  return new UserModelSelector()
 }
 
-export const userTypeModelPrimitives = selectFromUserType().email
+export const userModelPrimitives = selectFromUser().email

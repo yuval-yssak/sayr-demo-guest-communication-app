@@ -1,12 +1,12 @@
 import { types, flow } from 'mobx-state-tree'
 import jwtDecode from 'jwt-decode'
 import { now } from 'mobx-utils'
-import { UserTypeModel } from './UserTypeModel'
+import { UserModel } from './UserModel'
 
 const loggedInUser = types.maybeNull(
   types
     .model('loggedInUser', {
-      user: types.reference(UserTypeModel),
+      user: types.reference(UserModel),
       accessToken: types.string
     })
     .views(self => ({

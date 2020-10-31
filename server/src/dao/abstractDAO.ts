@@ -3,13 +3,14 @@ import {
   Collection,
   FilterQuery,
   CollectionInsertOneOptions,
-  UpdateQuery
+  UpdateQuery,
+  OptionalId
 } from 'mongodb'
 
-class abstractDAO {
+class abstractDAO<TSchema> {
   databaseName: string
   dbClient: MongoClient
-  collection: Collection
+  collection: Collection<TSchema>
   COLLECTION_NAME: string
 
   async init(client: MongoClient, dbName: string): Promise<void> {
@@ -47,10 +48,14 @@ class abstractDAO {
     await this.collection.drop()
   }
   // this should only be used when the expected result can be contained in memory as one chunk
-  async findArray(filter: FilterQuery<any>, options = {}) {
+  async findArray(
+    filter: FilterQuery<TSchema>,
+    options = {}
+  ): Promise<Array<TSchema>> {
     return await this.collection.find(filter, options).toArray()
   }
-  async *findSequence(filter: FilterQuery<any>, options = {}) {
+
+  async *findSequence(filter: FilterQuery<TSchema>, options = {}) {
     const cursor = this.collection.find(filter, options)
 
     while (await cursor.hasNext()) {
@@ -71,18 +76,25 @@ class abstractDAO {
     }
   }
 
-  async upsert(filter: FilterQuery<any>, newDocument: any, options = {}) {
+  async upsert(
+    filter: FilterQuery<TSchema>,
+    newDocument: TSchema,
+    options = {}
+  ) {
     return await this.collection.replaceOne(filter, newDocument, {
       upsert: true,
       ...options
     })
   }
 
-  async updateOne(filter: FilterQuery<any>, update: UpdateQuery<any>) {
+  async updateOne(filter: FilterQuery<TSchema>, update: UpdateQuery<TSchema>) {
     return await this.collection.updateOne(filter, update)
   }
 
-  async insertOne(doc: any, options?: CollectionInsertOneOptions) {
+  async insertOne(
+    doc: OptionalId<TSchema>,
+    options?: CollectionInsertOneOptions
+  ) {
     return await this.collection.insertOne(doc, options)
   }
 

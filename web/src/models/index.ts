@@ -2,7 +2,8 @@
 /* eslint-disable */
 /* tslint:disable */
 
-export * from './UserTypeModel'
+export * from './UserModel'
+export * from './EventModel'
 export * from './LoginResponseModel'
 export * from './RootStore'
 export * from './reactUtils'

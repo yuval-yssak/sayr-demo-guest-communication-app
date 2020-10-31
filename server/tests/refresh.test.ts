@@ -57,7 +57,7 @@ describe('test exchanging tokens', function () {
     expect(response.data.accessToken).to.not.be.empty
   })
 
-  it('refresh afer revoking token', async function () {
+  it.skip('refresh afer revoking token', async function () {
     const cookiejar = new toughCookie.CookieJar()
     const query = `mutation {
       login(email: "test@example.org", password: "123") {
