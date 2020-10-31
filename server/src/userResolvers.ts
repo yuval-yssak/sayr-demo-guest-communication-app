@@ -12,8 +12,8 @@ import {
 import { compare, hash } from 'bcryptjs'
 import usersDAO from './dao/usersDAO'
 import { MyContext } from './MyContext'
-import { UserType, createAccessToken, createRefreshToken } from './auth'
-import { isAuth } from './isAuth'
+import { UserType, createAccessToken, createRefreshToken } from './auth/auth'
+import { isAuth } from './auth/isAuth'
 import { ObjectId } from 'mongodb'
 
 @ObjectType()
@@ -48,8 +48,6 @@ class UserResolver {
     @Arg('email') email: string,
     @Arg('password') password: string
   ) {
-    // todo: handle case when user logged in previously only with oauth.
-
     const hashedPassword = await hash(password, 10)
     const user: UserType = (await usersDAO.findArray({ email }))?.[0]
 

@@ -1,6 +1,6 @@
 import { Resolver, Query, ObjectType, Field } from 'type-graphql'
 import usersDAO from './dao/usersDAO'
-import { UserType } from './auth'
+import { UserType } from './auth/auth'
 import axios from 'axios'
 import { inspect } from 'util'
 

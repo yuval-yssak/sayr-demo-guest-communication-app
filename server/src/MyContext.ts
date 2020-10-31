@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { LoginPayload } from './auth'
+import { LoginPayload } from './auth/auth'
 
 export interface MyContext {
   req: Request

@@ -1,12 +1,12 @@
 import { ObjectType, Field, ID } from 'type-graphql'
 import { ObjectID } from 'mongodb'
-import { jwt } from '../config/config'
+import { jwt } from '../../config/config'
 import { sign } from 'jsonwebtoken'
 
 import { Request, Response } from 'express'
 import 'reflect-metadata'
 import { verify } from 'jsonwebtoken'
-import usersDao from './dao/usersDAO'
+import usersDao from '../dao/usersDAO'
 
 @ObjectType()
 class UserType {
