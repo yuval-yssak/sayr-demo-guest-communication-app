@@ -6,6 +6,11 @@ const mongoDBConfig = {
 const jwt = {
   secretKeyForAccess: 'bydr28uldil8q7330rpy47y0a5w0c9uw0hzw9le24myk5vcviozcoma',
   secretKeyForRefresh: 'znsx6anpfj8vnplxdbxr68ijdfnusgrtpo1zdacyhqmnhcusfcy9xs'
-
 }
-export { mongoDBConfig, jwt }
+
+const email = {
+  sendGridAPI:
+    'jptusdwxrqdx5nuhk4o3uex661hxfnpu'
+}
+
+export { mongoDBConfig, jwt, email }

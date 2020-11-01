@@ -1,5 +1,4 @@
 import { Instance, types, getRoot } from 'mobx-state-tree'
-// @ts-ignore
 import route from 'path-match'
 
 /* The TypeScript type of an instance of ViewModel */
@@ -53,9 +52,10 @@ const routeMap: (view: ViewModelType) => IRoutes = view => ({
 })
 
 function createRouterInner(routes: IRoutes) {
-  const matchers: Array<[Function, Function]> = Object.keys(
-    routes
-  ).map(path => [route()(path), routes[path]])
+  const matchers = Object.keys(routes).map(path => [
+    route()(path),
+    routes[path]
+  ])
 
   return function (path: string) {
     return matchers.some(([matcher, f]) => {

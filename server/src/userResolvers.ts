@@ -3,13 +3,14 @@ import {
   Query,
   Mutation,
   Arg,
-  ID,
   ObjectType,
   Field,
   Ctx,
   UseMiddleware
 } from 'type-graphql'
 import { compare, hash } from 'bcryptjs'
+import { ObjectId } from 'mongodb'
+import dayjs from 'dayjs'
 import usersDAO, { UserType } from './dao/usersDAO'
 import {
   User,
@@ -20,8 +21,7 @@ import {
   authenticateClient,
   MyContext
 } from './auth/auth'
-import { ObjectId } from 'mongodb'
-
+import requestEmailVerification from './emailVerification'
 @ObjectType()
 class LoginResponse {
   @Field()
@@ -53,15 +53,25 @@ class UserResolver {
     const hashedPassword = await hash(password, 10)
     const user = (await usersDAO.findArray({ email }))?.[0]
 
+    const requestID = new ObjectId()
     try {
       if (user && !user.password) {
         // if the user registered with this email through OAuth,
         // the password is null. Set the new password.
-
         await usersDAO.updateOne(
           { _id: user._id },
-          { $set: { password: hashedPassword } }
+          {
+            $set: {
+              password: hashedPassword,
+              emailVerification: {
+                verified: false,
+                requestExpiresOn: dayjs().add(2, 'day').toDate(),
+                requestID
+              }
+            }
+          }
         )
+        requestEmailVerification(email, requestID)
 
         return true
       } else if (!user) {
@@ -69,9 +79,15 @@ class UserResolver {
 
         await usersDAO.insertOne({
           email,
+          emailVerification: {
+            verified: false,
+            requestExpiresOn: dayjs().add(2, 'day').toDate(),
+            requestID
+          },
           password: hashedPassword,
           tokenVersion: 0
         })
+        requestEmailVerification(email, requestID)
 
         return true
       }
@@ -99,7 +115,8 @@ class UserResolver {
 
     let valid = false
     try {
-      if (user.password) valid = await compare(password, user.password)
+      if (user.emailVerification?.verified && user.password)
+        valid = await compare(password, user.password)
     } catch {}
 
     if (!valid) throw new Error('wrong password')
@@ -131,13 +148,15 @@ class UserResolver {
   }
 
   @Mutation(() => Boolean)
-  async revokeRefreshTokensForUser(@Arg('userId', () => ID) userId: ObjectId) {
-    console.log(arguments)
-    await usersDAO.updateOne(
-      { id: new ObjectId(userId) },
-      { $inc: { accessToken: 1 } }
+  async revokeRefreshTokensForUser(
+    @Arg('userId', () => String) userId: string
+  ) {
+    console.log(userId)
+    const result = await usersDAO.updateOne(
+      { _id: new ObjectId(userId) },
+      { $inc: { tokenVersion: 1 } }
     )
-    return true
+    return result.modifiedCount === 1
   }
 }
 export { UserResolver, UserType }

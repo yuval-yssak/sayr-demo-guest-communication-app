@@ -1,6 +1,8 @@
 import { Request, Response, Express } from 'express'
-import { exchangeToken } from '../auth/auth'
+import { ObjectId } from 'mongodb'
 import passport from 'passport'
+import { exchangeToken } from '../auth/auth'
+import usersDAO from '../dao/usersDAO'
 
 const authRoutes = (app: Express) => {
   app.get('/', (_req, res) => res.send('hello'))
@@ -43,6 +45,43 @@ const authRoutes = (app: Express) => {
       req.session!.user = req.user
 
       res.redirect('http://localhost:3000/after-google-login')
+    }
+  )
+
+  app.get(
+    '/verify-email/:id',
+    async (req, res): Promise<void> => {
+      const requestID = req.params.id
+      const user = (
+        await usersDAO.findArray({
+          'emailVerification.requestID': new ObjectId(requestID),
+          'emailVerification.requestExpiresOn': { $gte: new Date() }
+        })
+      )?.[0]
+      if (user) {
+        await usersDAO.updateOne(
+          { _id: user._id },
+          {
+            $unset: {
+              'emailVerification.requestID': '',
+              'emailVerification.requestExpiresOn': ''
+            },
+            $set: {
+              'emailVerification.verified': true
+            }
+          }
+        )
+      } else {
+        res
+          .status(400)
+          .send('Did not find a user with your email from the last 48 hours')
+        return
+      }
+      res.send(
+        '<p>Great, you are verified.</p><a href="http://localhost:3000">Click here to head on to the app.</a>'
+      )
+      // todo: redirect to automatically log the user in.
+      return
     }
   )
 }

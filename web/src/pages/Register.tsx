@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { StoreContext, useQuery } from '../models/reactUtils'
 import Error from '../components/Error'
 import { observer } from 'mobx-react-lite'
@@ -12,10 +12,6 @@ function Register() {
   })
 
   const store = useContext(StoreContext)
-
-  useEffect(() => {
-    if (data) setTimeout(store.view.openHomepage, 1000)
-  }, [data, store.view.openHomepage])
 
   return (
     <form
@@ -42,7 +38,12 @@ function Register() {
       <button type="submit">Register</button>
       {loading && <p>Registering...</p>}
       {error && <Error error={error} />}
-      {data && 'Registered... ' && JSON.stringify(data)}
+      {data && (
+        <>
+          <p>Registered... {JSON.stringify(data)}</p>
+          <p>Check your email to verify the registration.</p>
+        </>
+      )}
     </form>
   )
 }
