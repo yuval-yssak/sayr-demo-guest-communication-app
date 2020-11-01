@@ -4,8 +4,9 @@ import App from './App'
 
 import { createHttpClient } from 'mst-gql'
 import { RootStore, RootStoreType, StoreContext } from './models'
-import { reaction } from 'mobx'
+import { reaction, autorun } from 'mobx'
 import { createRouter } from './models/view'
+import { ErrorBoundary, FallbackProps } from 'react-error-boundary'
 
 const gqlHttpClient = createHttpClient('http://localhost:4000/graphql', {
   credentials: 'include',
@@ -17,15 +18,30 @@ const rootStore = RootStore.create(undefined, {
 
 ;(window as any).store = rootStore
 
-ReactDOM.render(
-  <React.StrictMode>
-    <StoreContext.Provider value={rootStore}>
-      <App />
-    </StoreContext.Provider>
-  </React.StrictMode>,
-  document.getElementById('root')
+const FallBack: React.FC<FallbackProps> = ({ error }) => (
+  <p>An Error occured here... {error?.message} </p>
 )
 
+function render() {
+  ReactDOM.render(
+    <React.StrictMode>
+      <StoreContext.Provider value={rootStore}>
+        <ErrorBoundary FallbackComponent={FallBack} onError={console.error}>
+          <App />
+        </ErrorBoundary>
+      </StoreContext.Provider>
+    </React.StrictMode>,
+    document.getElementById('root')
+  )
+}
+
+try {
+  render()
+} catch (e) {
+  console.error(e)
+  localStorage.clear()
+  render()
+}
 /**
  * Routing
  */
@@ -38,6 +54,7 @@ reaction(
   }
 )
 
+// update authentication header for GraphQL whenever the access token updates.
 reaction(
   () => rootStore.loggedInUser?.accessToken,
   accessToken => {
@@ -55,18 +72,14 @@ window.onpopstate = function historyChange(ev: PopStateEvent) {
 
 router(window.location.pathname)
 
-reaction(
-  () => rootStore.view.page,
-  page => console.log(page)
-)
-
-reaction(
-  () => rootStore.loggedInUser?.isTokenValidWithMargin(5000),
-  () => {
-    if (!rootStore.loggedInUser?.isTokenValidWithMargin(5000))
-      rootStore.loggedInUser?.refreshToken()
-  }
-)
+// refresh token whenever it's 5 seconds away from being expired.
+autorun(() => {
+  if (
+    !rootStore.loggedInUser?.isTokenValidWithMargin(5000) &&
+    rootStore.loggedInUser?.isOnline
+  )
+    rootStore.loggedInUser?.refreshToken()
+})
 
 // synchronize login and logout on all tabs
 // relying on the localStorageMixin to update the "loggedInUser"

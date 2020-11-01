@@ -12,7 +12,13 @@ import {
 import { compare, hash } from 'bcryptjs'
 import usersDAO, { UserType } from './dao/usersDAO'
 import { MyContext } from './MyContext'
-import { User, createAccessToken, createRefreshToken } from './auth/auth'
+import {
+  User,
+  createAccessToken,
+  createRefreshToken,
+  installRefreshTokenCookie,
+  removeRefreshTokenCookie
+} from './auth/auth'
 import { isAuth } from './auth/isAuth'
 import { ObjectId } from 'mongodb'
 
@@ -78,7 +84,8 @@ class UserResolver {
   }
 
   // The login process consists of the return value and an httpOnly cookie.
-  // The LoginResponse return value has the access token and
+  // The return value has the short-lived access token and the cookie holds
+  // the refresh token.
   @Mutation(() => LoginResponse)
   async login(
     @Arg('email') email: string,
@@ -100,28 +107,13 @@ class UserResolver {
     const accessToken = createAccessToken(user)
     const refreshToken = createRefreshToken(user)
 
-    res.cookie('rx', refreshToken, {
-      httpOnly: true,
-      path: '/refresh-token',
-      maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
-      secure: process.env.NODE_ENV === 'production'
-    })
-
+    installRefreshTokenCookie(refreshToken, res)
     return { accessToken }
   }
 
   @Mutation(() => Boolean)
   logout(@Ctx() { res }: MyContext): Boolean {
-    console.log('logging out')
-
-    res.clearCookie('rx', {
-      httpOnly: true,
-      path: '/refresh-token',
-      domain: 'http://localhost:3000',
-      secure: process.env.NODE_ENV === 'production'
-    })
-
-    console.log('cookie cleared')
+    removeRefreshTokenCookie(res)
     return true
   }
 
@@ -129,20 +121,12 @@ class UserResolver {
   async finishLoginWithGoogle(
     @Ctx() { req, res }: MyContext
   ): Promise<LoginResponse> {
-    console.log('in server mutation, ', req.user, req.session)
-    const user: UserType = req.session?.user
+    const user = req.session?.user as UserType
 
     const accessToken = createAccessToken(user)
     const refreshToken = createRefreshToken(user)
-
-    res.cookie('rx', refreshToken, {
-      httpOnly: true,
-      path: '/refresh-token',
-      maxAge: 1000 * 60 * 60 * 24 * 7,
-      secure: process.env.NODE_ENV === 'production'
-    })
-    console.log('setting rx cookie ', refreshToken)
-
+    console.log('new refresh token is ', refreshToken)
+    installRefreshTokenCookie(refreshToken, res)
     return { accessToken }
   }
 

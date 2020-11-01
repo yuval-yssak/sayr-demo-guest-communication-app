@@ -22,59 +22,66 @@ class User {
   }
 }
 
-interface LoginPayload {
+interface AccessTokenPayload {
   userId: ObjectId
   tokenVersion: number
   email: string
 }
 
 function createAccessToken(user: UserType): string {
-  const payload: LoginPayload = {
+  const payload: AccessTokenPayload = {
     userId: user._id,
     email: user.email,
     tokenVersion: user.tokenVersion
   }
-  return sign(payload, jwt.secretKeyForAccess, {
-    expiresIn: '15s'
-  })
+  return sign(payload, jwt.secretKeyForAccess, { expiresIn: '15s' })
 }
 
 function createRefreshToken(user: UserType): string {
-  const payload: LoginPayload = {
+  const payload: AccessTokenPayload = {
     userId: user._id,
     tokenVersion: user.tokenVersion,
     email: user.email
   }
-  return sign(payload, jwt.secretKeyForRefresh, {
-    expiresIn: '7d'
+
+  return sign(payload, jwt.secretKeyForRefresh, { expiresIn: '7d' })
+}
+
+function installRefreshTokenCookie(refreshToken: string, res: Response) {
+  res.cookie('rx', refreshToken, {
+    httpOnly: true,
+    path: '/refresh-token',
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 1000 * 60 * 60 * 24 * 7
   })
 }
 
+// effectively logs out the user.
+// See https://expressjs.com/en/api.html#res.clearCookie
+function removeRefreshTokenCookie(res: Response) {
+  res.clearCookie('rx', {
+    httpOnly: true,
+    path: '/refresh-token',
+    secure: process.env.NODE_ENV === 'production'
+  })
+}
+
+// respond with a new access token
 async function exchangeToken(req: Request, res: Response): Promise<void> {
   try {
     const token = req.cookies.rx as string
-    console.log('in exchange token, ', token)
+
     if (token) {
-      let payload: LoginPayload
-      payload = verify(token, jwt.secretKeyForRefresh) as LoginPayload
+      let payload: AccessTokenPayload
+      payload = verify(token, jwt.secretKeyForRefresh) as AccessTokenPayload
 
       if (payload) {
-        // console.log('payload, ', payload)
         const user = (
           await usersDao.findArray({ _id: new ObjectId(payload.userId) })
         )?.[0]
 
         if (user) {
-          // console.log('user ', user)
-          if (user.tokenVersion! === payload.tokenVersion) {
-            const newExchangeToken = createRefreshToken(user)
-            res.cookie('rx', newExchangeToken, {
-              httpOnly: true,
-              path: '/refresh-token',
-              maxAge: 1000 * 60 * 60 * 24 * 7,
-              secure: process.env.NODE_ENV === 'production'
-            })
-
+          if (user.tokenVersion === payload.tokenVersion) {
             res.send({ ok: true, accessToken: createAccessToken(user) })
             return
           }
@@ -87,10 +94,13 @@ async function exchangeToken(req: Request, res: Response): Promise<void> {
     res.send({ ok: false, accessToken: '' })
   }
 }
+
 export {
   User,
   createAccessToken,
   createRefreshToken,
-  LoginPayload,
+  installRefreshTokenCookie,
+  removeRefreshTokenCookie,
+  AccessTokenPayload,
   exchangeToken
 }

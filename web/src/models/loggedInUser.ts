@@ -1,34 +1,48 @@
-import { types, flow } from 'mobx-state-tree'
+import { types, flow, getRoot } from 'mobx-state-tree'
 import jwtDecode from 'jwt-decode'
 import { now } from 'mobx-utils'
 
 const loggedInUser = types.maybeNull(
   types
     .model('loggedInUser', {
-      accessToken: types.string
+      accessToken: types.string,
+      isOnline: types.optional(types.boolean, window.navigator.onLine)
     })
     .views(self => ({
-      get id() {
-        const { userId } = jwtDecode(self.accessToken)
-
-        return userId
+      get id(): string {
+        return self.accessToken
+          ? (jwtDecode(self.accessToken) as any).userId
+          : ''
       },
       isTokenValidWithMargin(gapInMilliseconds: number) {
-        const { exp } = jwtDecode(self.accessToken)
+        if (self.accessToken) {
+          const { exp } = jwtDecode(self.accessToken)
 
-        return exp && now() + gapInMilliseconds < exp * 1000
+          return exp && now() + gapInMilliseconds < exp * 1000
+        } else return false
       }
     }))
     .views(self => ({
       get isTokenValid() {
         return self.isTokenValidWithMargin(0)
       },
-      get email() {
-        const { email } = jwtDecode(self.accessToken)
-        return email
+      get email(): string {
+        return self.accessToken
+          ? (jwtDecode(self.accessToken) as any).email
+          : ''
       }
     }))
     .actions(self => ({
+      setOnlineStatus(status: boolean) {
+        self.isOnline = status
+      }
+    }))
+    .actions(self => ({
+      afterCreate() {
+        // register listeners to observe navigator.online status via Mobx.
+        window.addEventListener('online', () => self.setOnlineStatus(true))
+        window.addEventListener('offline', () => self.setOnlineStatus(false))
+      },
       setAccessToken(newToken: string) {
         console.log('setting new access token')
         self.accessToken = newToken
@@ -43,8 +57,9 @@ const loggedInUser = types.maybeNull(
             credentials: 'include'
           }
         )
-        const json: { accessToken: string } = yield response.json()
-        self.setAccessToken(json.accessToken)
+        const json: { accessToken: string; ok: boolean } = yield response.json()
+        if (json.ok) self.setAccessToken(json.accessToken)
+        else (<any>getRoot(self)).logout()
       })
     }))
 )
