@@ -20,30 +20,25 @@ import { ObjectId } from 'mongodb'
 class LoginResponse {
   @Field()
   accessToken: string
-
-  @Field()
-  user: User
 }
 
 @Resolver()
 class UserResolver {
-  @Query(() => String)
-  hello() {
-    return 'Hello world!!!!'
-  }
-
+  // get list of all users
   @Query(() => [User])
   async users() {
     const users = await usersDAO.findArray({})
     return users.map(user => new User(user))
   }
 
+  // get only when authenticated
   @Query(() => String)
   @UseMiddleware(isAuth)
   tellASecret(@Ctx() { payload }: MyContext) {
     return `secret info..., your user id is ${payload.userId}`
   }
 
+  // register new user by email and password
   @Mutation(() => Boolean)
   async register(
     @Arg('email') email: string,
@@ -53,36 +48,49 @@ class UserResolver {
     const user = (await usersDAO.findArray({ email }))?.[0]
 
     try {
-      if (user) {
+      if (user && !user.password) {
+        // if the user registered with this email through OAuth,
+        // the password is null. Set the new password.
+
         await usersDAO.updateOne(
-          { _id: new ObjectId(user._id) },
+          { _id: user._id },
           { $set: { password: hashedPassword } }
         )
-      } else {
+
+        return true
+      } else if (!user) {
+        // create the new user record
+
         await usersDAO.insertOne({
           email,
           password: hashedPassword,
           tokenVersion: 0
         })
+
+        return true
       }
+      // In case the user exists already with a password, ignore.
+      return false
     } catch (e) {
       console.error(e)
-      return false
+      throw e
     }
-    return true
   }
 
+  // The login process consists of the return value and an httpOnly cookie.
+  // The LoginResponse return value has the access token and
   @Mutation(() => LoginResponse)
   async login(
     @Arg('email') email: string,
     @Arg('password') password: string,
     @Ctx() { res }: MyContext
   ): Promise<LoginResponse> {
+    // find user record by email
     const user = (await usersDAO.findArray({ email }))?.[0]
 
     if (!user) throw new Error('could not find user ' + email)
 
-    let valid: boolean = false
+    let valid = false
     try {
       if (user.password) valid = await compare(password, user.password)
     } catch {}
@@ -95,11 +103,11 @@ class UserResolver {
     res.cookie('rx', refreshToken, {
       httpOnly: true,
       path: '/refresh-token',
-      maxAge: 1000 * 60 * 60 * 24 * 7,
+      maxAge: 1000 * 60 * 60 * 24 * 7, // 7 days
       secure: process.env.NODE_ENV === 'production'
     })
 
-    return { accessToken, user: new User(user) }
+    return { accessToken }
   }
 
   @Mutation(() => Boolean)
@@ -135,7 +143,7 @@ class UserResolver {
     })
     console.log('setting rx cookie ', refreshToken)
 
-    return { accessToken, user: new User(user) }
+    return { accessToken }
   }
 
   @Mutation(() => Boolean)

@@ -32,7 +32,6 @@ type Refs = {
  * Enums for the names of base graphql actions
  */
 export enum RootStoreBaseQueries {
-  queryHello = 'queryHello',
   queryUsers = 'queryUsers',
   queryTellASecret = 'queryTellASecret',
   queryGetEvents = 'queryGetEvents'
@@ -65,13 +64,6 @@ export const RootStoreBase = withTypedRefs<Refs>()(
       users: types.optional(types.map(types.late((): any => UserModel)), {})
     })
     .actions(self => ({
-      queryHello(variables?: {}, options: QueryOptions = {}) {
-        return self.query<{ hello: string }>(
-          `query hello { hello }`,
-          variables,
-          options
-        )
-      },
       queryUsers(
         variables?: {},
         resultSelector:

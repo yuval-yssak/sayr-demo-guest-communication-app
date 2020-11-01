@@ -19,7 +19,7 @@ const Header: React.FC<Props> = () => {
       </header>
       <div>
         {store.loggedInUser ? (
-          <p>You are logged in as: {store.loggedInUser?.user.email}</p>
+          <p>You are logged in as: {store.loggedInUser?.email}</p>
         ) : (
           <p>Not logged in</p>
         )}

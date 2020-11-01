@@ -1,17 +1,17 @@
 import { types, flow } from 'mobx-state-tree'
 import jwtDecode from 'jwt-decode'
 import { now } from 'mobx-utils'
-import { UserModel } from './UserModel'
 
 const loggedInUser = types.maybeNull(
   types
     .model('loggedInUser', {
-      user: types.reference(UserModel),
       accessToken: types.string
     })
     .views(self => ({
       get id() {
-        return self.user.id
+        const { userId } = jwtDecode(self.accessToken)
+
+        return userId
       },
       isTokenValidWithMargin(gapInMilliseconds: number) {
         const { exp } = jwtDecode(self.accessToken)
@@ -22,6 +22,10 @@ const loggedInUser = types.maybeNull(
     .views(self => ({
       get isTokenValid() {
         return self.isTokenValidWithMargin(0)
+      },
+      get email() {
+        const { email } = jwtDecode(self.accessToken)
+        return email
       }
     }))
     .actions(self => ({

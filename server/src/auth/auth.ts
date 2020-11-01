@@ -25,11 +25,13 @@ class User {
 interface LoginPayload {
   userId: ObjectId
   tokenVersion: number
+  email: string
 }
 
 function createAccessToken(user: UserType): string {
   const payload: LoginPayload = {
     userId: user._id,
+    email: user.email,
     tokenVersion: user.tokenVersion
   }
   return sign(payload, jwt.secretKeyForAccess, {
@@ -40,7 +42,8 @@ function createAccessToken(user: UserType): string {
 function createRefreshToken(user: UserType): string {
   const payload: LoginPayload = {
     userId: user._id,
-    tokenVersion: user.tokenVersion
+    tokenVersion: user.tokenVersion,
+    email: user.email
   }
   return sign(payload, jwt.secretKeyForRefresh, {
     expiresIn: '7d'

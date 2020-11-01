@@ -1,4 +1,4 @@
-import { Instance, destroy, flow, SnapshotOrInstance } from 'mobx-state-tree'
+import { Instance, destroy, flow } from 'mobx-state-tree'
 import { RootStoreBase } from './RootStore.base'
 import ViewModel from './view'
 import loggedInUser from './loggedInUser'
@@ -17,25 +17,19 @@ export const RootStore = RootStoreBase.props({
       console.log(JSON.stringify(self))
     },
 
-    setLoggedInUser(input: SnapshotOrInstance<typeof self.loggedInUser>) {
+    setLoggedInUser(input: Instance<typeof self.loggedInUser>) {
       self.loggedInUser = input
-        ? loggedInUser.create({
-            accessToken: input.accessToken,
-            user: input.user.toString()
-          })
+        ? loggedInUser.create({ accessToken: input.accessToken })
         : null
     },
 
     login({ email, password }: { email: string; password: string }) {
-      const query = self.mutateLogin({ email, password }, s =>
-        s.accessToken.user()
-      )
+      const query = self.mutateLogin({ email, password })
       query
         .then(
           data =>
             (self.loggedInUser = loggedInUser.create({
-              accessToken: data.login.accessToken!,
-              user: data.login.user.id
+              accessToken: data.login.accessToken!
             })),
           error => console.error(error)
         )
@@ -51,13 +45,10 @@ export const RootStore = RootStoreBase.props({
       try {
         const query: {
           finishLoginWithGoogle: LoginResponseModelType
-        } = yield self.mutateFinishLoginWithGoogle({}, s =>
-          s.accessToken.user()
-        ).promise
+        } = yield self.mutateFinishLoginWithGoogle({}).promise
 
         self.loggedInUser = loggedInUser.create({
-          accessToken: query.finishLoginWithGoogle.accessToken!,
-          user: query.finishLoginWithGoogle.user.id
+          accessToken: query.finishLoginWithGoogle.accessToken!
         })
       } catch (e) {
         console.error('error on "finishe google login", ', e)
