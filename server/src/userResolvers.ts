@@ -11,15 +11,15 @@ import {
 } from 'type-graphql'
 import { compare, hash } from 'bcryptjs'
 import usersDAO, { UserType } from './dao/usersDAO'
-import { MyContext } from './MyContext'
 import {
   User,
   createAccessToken,
   createRefreshToken,
   installRefreshTokenCookie,
-  removeRefreshTokenCookie
+  removeRefreshTokenCookie,
+  authenticateClient,
+  MyContext
 } from './auth/auth'
-import { isAuth } from './auth/isAuth'
 import { ObjectId } from 'mongodb'
 
 @ObjectType()
@@ -39,7 +39,7 @@ class UserResolver {
 
   // get only when authenticated
   @Query(() => String)
-  @UseMiddleware(isAuth)
+  @UseMiddleware(authenticateClient)
   tellASecret(@Ctx() { payload }: MyContext) {
     return `secret info..., your user id is ${payload.userId}`
   }

@@ -10,7 +10,7 @@ import {
 class abstractDAO<TSchema> {
   databaseName: string
   dbClient: MongoClient
-  collection: Collection<TSchema>
+  collection: Collection
   COLLECTION_NAME: string
 
   async init(client: MongoClient, dbName: string): Promise<void> {

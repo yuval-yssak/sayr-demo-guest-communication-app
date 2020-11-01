@@ -34,6 +34,8 @@ const authRoutes = (app: Express) => {
     })
   )
 
+  // store server-side cookie session for 5 seconds and
+  // redirect the client back to the client app.
   app.get(
     '/login-with-google/callback',
     passport.authenticate('google', { session: false }),

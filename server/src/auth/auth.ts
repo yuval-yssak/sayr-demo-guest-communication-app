@@ -7,6 +7,13 @@ import { Request, Response } from 'express'
 import 'reflect-metadata'
 import { verify } from 'jsonwebtoken'
 import usersDao, { UserType } from '../dao/usersDAO'
+import { MiddlewareFn } from 'type-graphql'
+
+export interface MyContext {
+  req: Request
+  res: Response
+  payload: AccessTokenPayload
+}
 
 @ObjectType()
 class User {
@@ -95,6 +102,24 @@ async function exchangeToken(req: Request, res: Response): Promise<void> {
   }
 }
 
+const authenticateClient: MiddlewareFn<MyContext> = ({ context }, next) => {
+  const authentication = context.req.headers['authentication']
+
+  if (!authentication) throw new Error('not authenticated')
+
+  const token = (authentication as string).split(' ')[1]
+  const payload = verify(
+    token,
+    jwt.secretKeyForAccess,
+    {}
+  ) as AccessTokenPayload
+
+  context.payload = payload
+  if (!payload?.userId) throw new Error('not completely verified')
+
+  return next()
+}
+
 export {
   User,
   createAccessToken,
@@ -102,5 +127,6 @@ export {
   installRefreshTokenCookie,
   removeRefreshTokenCookie,
   AccessTokenPayload,
-  exchangeToken
+  exchangeToken,
+  authenticateClient
 }

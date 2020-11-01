@@ -15,7 +15,7 @@
  *                   valid for 5 seconds, allowing the user to fetch the tokens
  *                   from the server url.
  *
- * 4. passport     -
+ * 4. passport     - OAuth setup
  */
 
 import express from 'express'
