@@ -59,7 +59,7 @@ const loggedInUser = types.maybeNull(
         )
         const json: { accessToken: string; ok: boolean } = yield response.json()
         if (json.ok) self.setAccessToken(json.accessToken)
-        else (<any>getRoot(self)).logout()
+        else (getRoot(self) as any).logout()
       })
     }))
 )
