@@ -4,7 +4,7 @@ import {
   VerifyCallback,
   Profile
 } from 'passport-google-oauth20'
-import UsersDAO from './dao/usersDAO'
+import UsersDAO from './dao/UsersDAO'
 
 async function connectOauthToDB(
   accessToken: string,

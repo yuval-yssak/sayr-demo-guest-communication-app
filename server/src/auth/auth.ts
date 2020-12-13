@@ -6,7 +6,7 @@ import { sign } from 'jsonwebtoken'
 import { Request, Response } from 'express'
 import 'reflect-metadata'
 import { verify } from 'jsonwebtoken'
-import usersDao, { UserType } from '../dao/usersDAO'
+import usersDao, { IUser } from '../dao/UsersDAO'
 import { MiddlewareFn } from 'type-graphql'
 
 export interface MyContext {
@@ -23,7 +23,7 @@ class User {
   @Field()
   email: string
 
-  constructor(user: UserType) {
+  constructor(user: IUser) {
     this.id = user._id
     this.email = user.email
   }
@@ -35,7 +35,7 @@ interface AccessTokenPayload {
   email: string
 }
 
-function createAccessToken(user: UserType): string {
+function createAccessToken(user: IUser): string {
   const payload: AccessTokenPayload = {
     userId: user._id,
     email: user.email,
@@ -44,7 +44,7 @@ function createAccessToken(user: UserType): string {
   return sign(payload, jwt.secretKeyForAccess, { expiresIn: '15s' })
 }
 
-function createRefreshToken(user: UserType): string {
+function createRefreshToken(user: IUser): string {
   const payload: AccessTokenPayload = {
     userId: user._id,
     tokenVersion: user.login.tokenVersion,

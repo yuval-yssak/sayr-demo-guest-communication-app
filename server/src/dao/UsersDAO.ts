@@ -1,5 +1,5 @@
 import { ObjectId, WithId } from 'mongodb'
-import AbstractDAO from './abstractDAO'
+import AbstractDAO from './AbstractDAO'
 import { Profile } from 'passport-google-oauth20'
 
 /**
@@ -8,7 +8,7 @@ import { Profile } from 'passport-google-oauth20'
  * null personId means that the email has not been connected yet to a person_id from Retreat Guru.
  * tokenVersion allows to force unilaterally sign-out a user
  */
-export type UserType = WithId<{
+export type IUser = WithId<{
   personId: number | null
   email: string
   permissionLevel: 'none' | 'staff' | 'manager' | 'admin'
@@ -39,7 +39,7 @@ export type UserType = WithId<{
   }[]
 }>
 
-class UsersDAO extends AbstractDAO<UserType> {
+class UsersDAO extends AbstractDAO<IUser> {
   COLLECTION_NAME = 'users'
 }
 

@@ -2,7 +2,7 @@ import { Request, Response, Express } from 'express'
 import { ObjectId } from 'mongodb'
 import passport from 'passport'
 import { exchangeToken } from '../auth/auth'
-import UsersDAO from '../dao/usersDAO'
+import UsersDAO from '../dao/UsersDAO'
 
 const authRoutes = (app: Express) => {
   app.get('/', (_req, res) => res.send('hello'))

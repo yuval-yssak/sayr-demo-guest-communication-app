@@ -64,6 +64,4 @@ export const RootStore = RootStoreBase.props({
     }
   }))
 
-  .extend(
-    localStorageMixin({ filter: ['loggedInUser', 'userTypes'], throttle: 2000 })
-  )
+  .extend(localStorageMixin({ filter: ['loggedInUser'], throttle: 2000 }))

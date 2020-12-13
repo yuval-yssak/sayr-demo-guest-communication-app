@@ -9,7 +9,7 @@ import {
 import { compare, hash } from 'bcryptjs'
 import { ObjectId } from 'mongodb'
 import dayjs from 'dayjs'
-import UsersDAO, { UserType } from './dao/usersDAO'
+import UsersDAO, { IUser } from './dao/UsersDAO'
 import {
   User,
   createAccessToken,
@@ -138,7 +138,7 @@ class UserResolver {
   async finishLoginWithGoogle(
     @Ctx() { req, res }: MyContext
   ): Promise<LoginResponse> {
-    const user = req.session?.user as UserType
+    const user = req.session?.user as IUser
 
     const accessToken = createAccessToken(user)
     const refreshToken = createRefreshToken(user)
@@ -160,4 +160,4 @@ class UserResolver {
   }
 }
 
-export { UserResolver, UserType }
+export { UserResolver, IUser }

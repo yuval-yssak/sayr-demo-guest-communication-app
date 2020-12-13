@@ -46,6 +46,6 @@
     "start": "ts-node src/index.ts",
     "dev": "ts-node-dev src/index.ts",
     "test": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' mocha -r ts-node/register 'tests/**/*.ts'",
-    "tslint": "tslint"
+    "tslint": "tslint --project ."
   }
 }
