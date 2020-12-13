@@ -17,6 +17,7 @@
     "@types/tough-cookie": "^4.0.0",
     "axios-cookiejar-support": "^1.0.1",
     "chai": "^4.2.0",
+    "class-validator": "^0.12.2",
     "mocha": "^8.2.0",
     "tough-cookie": "^4.0.0",
     "ts-node": "^9.0.0",

@@ -5,7 +5,7 @@ import {
   ICompoundRegistration,
   IItem,
   IPayment
-} from 'src/dao/CompoundRegistrationsDAO'
+} from '../dao/CompoundRegistrationsDAO'
 
 dayjs.extend(isSameOrAfter)
 

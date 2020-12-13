@@ -7,13 +7,19 @@ import { loadDataAccess } from './loaders/mainLoader'
 import authRoutes from './routes/authRoutes'
 import app from './expressApp'
 import { AnnouncementResolver } from './graphql/resolvers/AnnouncementResolver'
+import { NotificationResolver } from './graphql/resolvers/NotificationResolver'
 
 async function start() {
   await loadDataAccess()
 
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
-      resolvers: [UserResolver, CompoundResolver, AnnouncementResolver]
+      resolvers: [
+        UserResolver,
+        CompoundResolver,
+        AnnouncementResolver,
+        NotificationResolver
+      ]
     }),
     context: ({ req, res }) => ({ req, res })
   })

@@ -4,7 +4,7 @@ import {
   IPayment,
   IRegistration,
   IRegistrationStatus
-} from 'src/dao/CompoundRegistrationsDAO'
+} from '../../dao/CompoundRegistrationsDAO'
 import { Field, ObjectType } from 'type-graphql'
 
 @ObjectType()
