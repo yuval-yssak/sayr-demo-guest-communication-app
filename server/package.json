@@ -30,7 +30,7 @@
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
-    "dayjs": "^1.9.4",
+    "dayjs": "^1.9.7",
     "express": "^4.17.1",
     "express-session": "^1.17.1",
     "googleapis": "^62.0.0",

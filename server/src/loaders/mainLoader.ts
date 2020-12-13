@@ -2,6 +2,11 @@ import { mongoDBConfig } from '../../config/config'
 import { MongoClient } from 'mongodb'
 import { connect } from './mongoClient'
 import UsersDAO from '../dao/UsersDAO'
+import CompoundRegistrationsDAO from '../dao/CompoundRegistrationsDAO'
+import AnnouncementsDAO from '../dao/AnnouncementsDAO'
+import ChatMessagesDAO from '../dao/ChatMessagesDAO'
+import NotificationsDAO from '../dao/NotificationsDAO'
+import ScheduleDAO from '../dao/ScheduleDAO'
 
 let dbClient: MongoClient
 
@@ -10,6 +15,11 @@ async function loadDataAccess(customDBName?: string) {
 
   dbClient = await connect()
   await UsersDAO.init(dbClient, resolvedDBName)
+  await CompoundRegistrationsDAO.init(dbClient, resolvedDBName)
+  await AnnouncementsDAO.init(dbClient, resolvedDBName)
+  await ChatMessagesDAO.init(dbClient, resolvedDBName)
+  await NotificationsDAO.init(dbClient, resolvedDBName)
+  await ScheduleDAO.init(dbClient, resolvedDBName)
 }
 
 async function closeDataAccess() {

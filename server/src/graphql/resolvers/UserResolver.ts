@@ -9,7 +9,7 @@ import {
 import { compare, hash } from 'bcryptjs'
 import { ObjectId } from 'mongodb'
 import dayjs from 'dayjs'
-import UsersDAO, { IUser } from './dao/UsersDAO'
+import UsersDAO, { IUser } from '../../dao/UsersDAO'
 import {
   User,
   createAccessToken,
@@ -18,9 +18,9 @@ import {
   removeRefreshTokenCookie,
   authenticateClient,
   MyContext
-} from './auth/auth'
-import requestEmailVerification from './emailVerification'
-import LoginResponse from './graphql/schema/LoginResponse'
+} from '../../auth/auth'
+import requestEmailVerification from '../../emailVerification'
+import LoginResponse from '../schema/LoginResponse'
 
 @Resolver()
 class UserResolver {
