@@ -2,7 +2,7 @@ import { Request, Response, Express } from 'express'
 import { ObjectId } from 'mongodb'
 import passport from 'passport'
 import { exchangeToken } from '../auth/auth'
-import usersDAO from '../dao/usersDAO'
+import UsersDAO from '../dao/usersDAO'
 
 const authRoutes = (app: Express) => {
   app.get('/', (_req, res) => res.send('hello'))
@@ -53,21 +53,21 @@ const authRoutes = (app: Express) => {
     async (req, res): Promise<void> => {
       const requestID = req.params.id
       const user = (
-        await usersDAO.findArray({
-          'emailVerification.requestID': new ObjectId(requestID),
-          'emailVerification.requestExpiresOn': { $gte: new Date() }
+        await UsersDAO.findArray({
+          'login.emailVerification.requestID': new ObjectId(requestID),
+          'login.emailVerification.requestExpiresOn': { $gte: new Date() }
         })
       )?.[0]
       if (user) {
-        await usersDAO.updateOne(
+        await UsersDAO.updateOne(
           { _id: user._id },
           {
             $unset: {
-              'emailVerification.requestID': '',
-              'emailVerification.requestExpiresOn': ''
+              'login.emailVerification.requestID': '',
+              'login.emailVerification.requestExpiresOn': ''
             },
             $set: {
-              'emailVerification.verified': true
+              'login.emailVerification.verified': true
             }
           }
         )

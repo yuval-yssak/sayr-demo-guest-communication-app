@@ -4,9 +4,9 @@ import {
   VerifyCallback,
   Profile
 } from 'passport-google-oauth20'
-import usersDAO from './dao/usersDAO'
+import UsersDAO from './dao/usersDAO'
 
-const connectOauthToDB = async function (
+async function connectOauthToDB(
   accessToken: string,
   refreshToken: string,
   profile: Profile,
@@ -15,12 +15,12 @@ const connectOauthToDB = async function (
   // capture the user's first email from the OAuth profile
   const profileEmail: string = profile.emails?.[0].value || ''
 
-  let user = (await usersDAO.findArray({ email: profileEmail }))?.[0]
+  let user = (await UsersDAO.findArray({ email: profileEmail }))?.[0]
 
   if (user) {
     // If the user is registered, update its profile along with the auth tokens
 
-    usersDAO.updateOne(
+    UsersDAO.updateOne(
       { _id: user._id },
       { $set: { oauth: { google: { profile, accessToken, refreshToken } } } }
     )
@@ -28,15 +28,21 @@ const connectOauthToDB = async function (
     // if the user has not registered before, create it and copy its profile.
 
     try {
-      const insertResult = await usersDAO.insertOne({
+      const insertResult = await UsersDAO.insertOne({
         email: profileEmail,
-        password: null,
-        tokenVersion: 0,
-        oauth: { google: { profile, accessToken, refreshToken } }
+        login: {
+          password: null,
+          tokenVersion: 0,
+          oauth: { google: { profile, accessToken, refreshToken } }
+        },
+        invitationsSent: [],
+        permissionLevel: 'none',
+        personId: null,
+        subscriptions: []
       })
 
       user = (
-        await usersDAO.findArray({
+        await UsersDAO.findArray({
           _id: insertResult.insertedId
         })
       )?.[0]

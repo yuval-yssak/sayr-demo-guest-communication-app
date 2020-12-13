@@ -7,7 +7,7 @@ import {
   OptionalId
 } from 'mongodb'
 
-class abstractDAO<TSchema> {
+class AbstractDAO<TSchema> {
   databaseName: string
   dbClient: MongoClient
   collection: Collection
@@ -17,7 +17,7 @@ class abstractDAO<TSchema> {
     this.databaseName = dbName
     this.dbClient = client
 
-    const existingCollections: Array<Collection> = await this.dbClient
+    const existingCollections: Collection[] = await this.dbClient
       .db(dbName)
       .collections()
 
@@ -51,7 +51,7 @@ class abstractDAO<TSchema> {
   async findArray(
     filter: FilterQuery<TSchema>,
     options = {}
-  ): Promise<Array<TSchema>> {
+  ): Promise<TSchema[]> {
     return await this.collection.find(filter, options).toArray()
   }
 
@@ -103,4 +103,4 @@ class abstractDAO<TSchema> {
   }
 }
 
-export default abstractDAO
+export default AbstractDAO

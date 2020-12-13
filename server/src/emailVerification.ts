@@ -1,8 +1,8 @@
 import { setApiKey, send } from '@sendgrid/mail'
 import { ObjectId } from 'mongodb'
-import { email } from '../config/config'
+import { email as emailConfig } from '../config/config'
 
-setApiKey(email.sendGridAPI)
+setApiKey(emailConfig.sendGridAPI)
 
 const requestEmailVerification: (email: string, requestID: ObjectId) => void = (
   email,

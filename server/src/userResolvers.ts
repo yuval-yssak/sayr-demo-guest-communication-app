@@ -3,15 +3,13 @@ import {
   Query,
   Mutation,
   Arg,
-  ObjectType,
-  Field,
   Ctx,
   UseMiddleware
 } from 'type-graphql'
 import { compare, hash } from 'bcryptjs'
 import { ObjectId } from 'mongodb'
 import dayjs from 'dayjs'
-import usersDAO, { UserType } from './dao/usersDAO'
+import UsersDAO, { UserType } from './dao/usersDAO'
 import {
   User,
   createAccessToken,
@@ -22,18 +20,14 @@ import {
   MyContext
 } from './auth/auth'
 import requestEmailVerification from './emailVerification'
-@ObjectType()
-class LoginResponse {
-  @Field()
-  accessToken: string
-}
+import LoginResponse from './graphql/schema/LoginResponse'
 
 @Resolver()
 class UserResolver {
   // get list of all users
   @Query(() => [User])
   async users() {
-    const users = await usersDAO.findArray({})
+    const users = await UsersDAO.findArray({})
     return users.map(user => new User(user))
   }
 
@@ -51,14 +45,14 @@ class UserResolver {
     @Arg('password') password: string
   ) {
     const hashedPassword = await hash(password, 10)
-    const user = (await usersDAO.findArray({ email }))?.[0]
+    const user = (await UsersDAO.findArray({ email }))?.[0]
 
     const requestID = new ObjectId()
     try {
-      if (user && !user.password) {
+      if (user && !user.login.password) {
         // if the user registered with this email through OAuth,
         // the password is null. Set the new password.
-        await usersDAO.updateOne(
+        await UsersDAO.updateOne(
           { _id: user._id },
           {
             $set: {
@@ -77,15 +71,21 @@ class UserResolver {
       } else if (!user) {
         // create the new user record
 
-        await usersDAO.insertOne({
+        await UsersDAO.insertOne({
           email,
-          emailVerification: {
-            verified: false,
-            requestExpiresOn: dayjs().add(2, 'day').toDate(),
-            requestID
+          login: {
+            emailVerification: {
+              verified: false,
+              requestExpiresOn: dayjs().add(2, 'day').toDate(),
+              requestID
+            },
+            password: hashedPassword,
+            tokenVersion: 0
           },
-          password: hashedPassword,
-          tokenVersion: 0
+          invitationsSent: [],
+          permissionLevel: 'none',
+          personId: null /* TODO: if email matches - bring in the proper id */,
+          subscriptions: []
         })
         requestEmailVerification(email, requestID)
 
@@ -109,14 +109,14 @@ class UserResolver {
     @Ctx() { res }: MyContext
   ): Promise<LoginResponse> {
     // find user record by email
-    const user = (await usersDAO.findArray({ email }))?.[0]
+    const user = (await UsersDAO.findArray({ email }))?.[0]
 
     if (!user) throw new Error('could not find user ' + email)
 
     let valid = false
     try {
-      if (user.emailVerification?.verified && user.password)
-        valid = await compare(password, user.password)
+      if (user.login.emailVerification?.verified && user.login.password)
+        valid = await compare(password, user.login.password)
     } catch {}
 
     if (!valid) throw new Error('wrong password')
@@ -129,7 +129,7 @@ class UserResolver {
   }
 
   @Mutation(() => Boolean)
-  logout(@Ctx() { res }: MyContext): Boolean {
+  logout(@Ctx() { res }: MyContext): boolean {
     removeRefreshTokenCookie(res)
     return true
   }
@@ -152,11 +152,12 @@ class UserResolver {
     @Arg('userId', () => String) userId: string
   ) {
     console.log(userId)
-    const result = await usersDAO.updateOne(
+    const result = await UsersDAO.updateOne(
       { _id: new ObjectId(userId) },
       { $inc: { tokenVersion: 1 } }
     )
     return result.modifiedCount === 1
   }
 }
+
 export { UserResolver, UserType }

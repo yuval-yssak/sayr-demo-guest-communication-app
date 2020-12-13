@@ -39,7 +39,7 @@ function createAccessToken(user: UserType): string {
   const payload: AccessTokenPayload = {
     userId: user._id,
     email: user.email,
-    tokenVersion: user.tokenVersion
+    tokenVersion: user.login.tokenVersion
   }
   return sign(payload, jwt.secretKeyForAccess, { expiresIn: '15s' })
 }
@@ -47,7 +47,7 @@ function createAccessToken(user: UserType): string {
 function createRefreshToken(user: UserType): string {
   const payload: AccessTokenPayload = {
     userId: user._id,
-    tokenVersion: user.tokenVersion,
+    tokenVersion: user.login.tokenVersion,
     email: user.email
   }
 
@@ -88,7 +88,7 @@ async function exchangeToken(req: Request, res: Response): Promise<void> {
         )?.[0]
 
         if (user) {
-          if (user.tokenVersion === payload.tokenVersion) {
+          if (user.login.tokenVersion === payload.tokenVersion) {
             res.send({ ok: true, accessToken: createAccessToken(user) })
             return
           }
@@ -103,7 +103,7 @@ async function exchangeToken(req: Request, res: Response): Promise<void> {
 }
 
 const authenticateClient: MiddlewareFn<MyContext> = ({ context }, next) => {
-  const authentication = context.req.headers['authentication']
+  const { authentication } = context.req.headers
 
   if (!authentication) throw new Error('not authenticated')
 
