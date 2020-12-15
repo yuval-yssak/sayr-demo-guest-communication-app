@@ -46,12 +46,26 @@ class Invitation {
 
 @ObjectType()
 class Subscription {
-  @Field({ nullable: true }) name?: string
+  @Field() userAgent: string
   @Field() endpoint: string
+  @Field() p256dhKey: string
+  @Field() authKey: string
 
-  constructor({ name, endpoint }: { name?: string; endpoint: string }) {
-    this.name = name
+  constructor({
+    userAgent,
+    endpoint,
+    p256dhKey,
+    authKey
+  }: {
+    userAgent: string
+    endpoint: string
+    p256dhKey: string
+    authKey: string
+  }) {
+    this.userAgent = userAgent
     this.endpoint = endpoint
+    this.p256dhKey = p256dhKey
+    this.authKey = authKey
   }
 }
 
@@ -64,14 +78,22 @@ class AppUser extends User {
 
   constructor(user: IUser) {
     super(user)
+    console.log(user)
     this.personId = user.personId
     this.permissionLevel = user.permissionLevel
     this.invitationsSent = user.invitationsSent.map(
       i => new Invitation({ timestamp: i.timestamp, staffPersonId: i.staff })
     )
     this.subscriptions = user.subscriptions.map(
-      s => new Subscription({ name: s.name, endpoint: s.endpoint })
+      s =>
+        new Subscription({
+          userAgent: s.userAgent,
+          endpoint: s.endpoint,
+          p256dhKey: s.keys.p256dh,
+          authKey: s.keys.auth
+        })
     )
+    console.log(this.subscriptions)
   }
 }
 
@@ -248,7 +270,39 @@ class UserResolver {
 
     return result.result.ok === 1
   }
+
+  // PushSubscription {
+  //   endpoint: string;
+  //   keys: {
+  //       p256dh: string;
+  //       auth: string;
+  //   }
+
+  @Mutation(() => Boolean)
+  async createUserSubscription(
+    @Arg('userId') userId: string,
+    @Arg('userAgent') userAgent: string,
+    @Arg('endpoint') endpoint: string,
+    @Arg('p256dhKey') p256dhKey: string,
+    @Arg('authKey') authKey: string
+  ): Promise<boolean> {
+    const result = await UsersDAO.updateOne(
+      { _id: new ObjectID(userId) },
+      {
+        $push: {
+          subscriptions: {
+            userAgent,
+            endpoint,
+            keys: {
+              p256dh: p256dhKey,
+              auth: authKey
+            }
+          }
+        }
+      }
+    )
+    return result.result.ok === 1
+  }
 }
-;``
 
 export { UserResolver, IUser }

@@ -38,7 +38,7 @@ export type IUser = WithId<{
   }
   invitationsSent: { timestamp: Date; staff: number }[]
   subscriptions: {
-    name: string
+    userAgent: string
     endpoint: string
     keys: {
       p256dh: string
