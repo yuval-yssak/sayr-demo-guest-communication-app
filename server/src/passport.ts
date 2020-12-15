@@ -4,7 +4,7 @@ import {
   VerifyCallback,
   Profile
 } from 'passport-google-oauth20'
-import UsersDAO from './dao/UsersDAO'
+import UsersDAO, { PermissionLevel } from './dao/UsersDAO'
 
 async function connectOauthToDB(
   accessToken: string,
@@ -36,7 +36,7 @@ async function connectOauthToDB(
           oauth: { google: { profile, accessToken, refreshToken } }
         },
         invitationsSent: [],
-        permissionLevel: 'none',
+        permissionLevel: PermissionLevel.None,
         personId: null,
         subscriptions: []
       })

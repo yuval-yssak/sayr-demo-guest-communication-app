@@ -8,10 +8,18 @@ import { Profile } from 'passport-google-oauth20'
  * null personId means that the email has not been connected yet to a person_id from Retreat Guru.
  * tokenVersion allows to force unilaterally sign-out a user
  */
+
+export enum PermissionLevel {
+  None = 'none',
+  Staff = 'staff',
+  Manager = 'manager',
+  Admin = 'admin'
+}
+
 export type IUser = WithId<{
   personId: number | null
   email: string
-  permissionLevel: 'none' | 'staff' | 'manager' | 'admin'
+  permissionLevel: PermissionLevel
   login: {
     emailVerification?: {
       verified: boolean
