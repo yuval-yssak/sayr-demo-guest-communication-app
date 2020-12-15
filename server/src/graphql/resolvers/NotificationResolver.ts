@@ -1,4 +1,4 @@
-import { Resolver, Arg, Mutation, Field, InputType } from 'type-graphql'
+import { Resolver, Arg, Mutation, Field, InputType, Int } from 'type-graphql'
 import { ObjectID } from 'mongodb'
 import NotificationResponse from '../schema/NotificationResponse'
 import NotificationsDAO, { INotification } from '../../dao/NotificationsDAO'
@@ -7,7 +7,7 @@ import AnnouncementsDAO from '../../dao/AnnouncementsDAO'
 
 @InputType()
 class PersonInput {
-  @Field()
+  @Field(() => Int)
   id: number
 }
 
@@ -16,7 +16,7 @@ console.log(PersonInput)
 export class NotificationResolver {
   @Mutation(() => [NotificationResponse])
   async createNotificationsForAnnouncement(
-    @Arg('person', () => [PersonInput]) persons: PersonInput[],
+    @Arg('persons', () => [PersonInput]) persons: PersonInput[],
     @Arg('announcementID') announcementID: string
   ): Promise<NotificationResponse[]> {
     const users = await UsersDAO.findArray({
