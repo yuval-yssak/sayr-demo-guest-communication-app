@@ -4,6 +4,7 @@ import NotificationResponse from '../schema/NotificationResponse'
 import NotificationsDAO, { INotification } from '../../dao/NotificationsDAO'
 import UsersDAO from '../../dao/UsersDAO'
 import AnnouncementsDAO from '../../dao/AnnouncementsDAO'
+import webPush from 'web-push'
 
 @InputType()
 class PersonInput {
@@ -19,6 +20,9 @@ export class NotificationResolver {
     @Arg('persons', () => [PersonInput]) persons: PersonInput[],
     @Arg('announcementID') announcementID: string
   ): Promise<NotificationResponse[]> {
+    const [anAnnouncement] = await AnnouncementsDAO.findArray({
+      _id: new ObjectID(announcementID)
+    })
     const users = await UsersDAO.findArray({
       personId: { $in: persons.map(p => p.id) }
     })
@@ -28,8 +32,23 @@ export class NotificationResolver {
     // get recipient endpoints
 
     const results = await Promise.all(
-      usersWithSubscriptions.map(user =>
-        NotificationsDAO.insertOne({
+      usersWithSubscriptions.map(async user => {
+        webPush.setVapidDetails(
+          'mailto:a@example.com',
+          'BFsdpKVL7oSeZspZ8Aa6pyaW1oQbI11bmd_-bpduPnS9_UT8DRhCp3gdTZ_2e9HpFrTfU-lqZuj98Tvvva2-Zdw',
+          'ESrGXUAklUux9U-IuHL1QXLiORiiHEOikyi8tFs7GKM'
+        )
+        user.subscriptions.map(sub => {
+          console.log('sending notifications', sub)
+          webPush.sendNotification(
+            { endpoint: sub.endpoint, keys: sub.keys },
+            JSON.stringify({
+              title: anAnnouncement.subject,
+              content: anAnnouncement.body
+            })
+          )
+        })
+        return await NotificationsDAO.insertOne({
           parentAnnouncement: new ObjectID(announcementID),
           recipient: {
             id: user.personId!,
@@ -40,7 +59,7 @@ export class NotificationResolver {
           },
           timestamp: new Date()
         })
-      )
+      })
     )
 
     const resultArray = results.flatMap(result => result.ops as INotification[])

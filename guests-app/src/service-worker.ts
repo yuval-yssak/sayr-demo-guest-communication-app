@@ -79,3 +79,16 @@ self.addEventListener('message', event => {
 })
 
 // Any other custom service worker logic can go here.
+self.addEventListener('push', event => {
+  console.log('push notification received', event)
+
+  let data = { title: 'New!', content: 'something new happened' }
+  if (event.data) data = JSON.parse(event.data.text())
+  console.log(data)
+  event.waitUntil(
+    self.registration.showNotification(data.title, {
+      body: data.content,
+      icon: '/logo192.png'
+    })
+  )
+})

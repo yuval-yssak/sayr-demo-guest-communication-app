@@ -52,6 +52,10 @@ const authRoutes = (app: Express) => {
     '/verify-email/:id',
     async (req, res): Promise<void> => {
       const requestID = req.params.id
+      console.log({
+        'emailVerification.requestID': requestID,
+        'emailVerification.requestExpiresOn': { $gte: new Date() }
+      })
       const user = (
         await UsersDAO.findArray({
           'login.emailVerification.requestID': new ObjectId(requestID),
