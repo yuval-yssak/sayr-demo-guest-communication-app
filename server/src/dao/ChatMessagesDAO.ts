@@ -9,8 +9,8 @@ export type ISchedule = WithId<{
   read: boolean
 }>
 
-class UsersDAO extends AbstractDAO<ISchedule> {
+class ChatMessagesDAO extends AbstractDAO<ISchedule> {
   COLLECTION_NAME = 'chatMessages'
 }
 
-export default new UsersDAO()
+export default new ChatMessagesDAO()

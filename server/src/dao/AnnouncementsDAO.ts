@@ -10,8 +10,8 @@ export type IAnnouncement = WithId<{
   updated_at: Date
 }>
 
-class UsersDAO extends AbstractDAO<IAnnouncement> {
+class AnnouncementsDAO extends AbstractDAO<IAnnouncement> {
   COLLECTION_NAME = 'announcements'
 }
 
-export default new UsersDAO()
+export default new AnnouncementsDAO()

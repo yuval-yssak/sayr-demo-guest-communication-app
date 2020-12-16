@@ -19,8 +19,8 @@ export type INotification = WithId<{
   }
 }>
 
-class UsersDAO extends AbstractDAO<INotification> {
+class NotificationsDAO extends AbstractDAO<INotification> {
   COLLECTION_NAME = 'notifications'
 }
 
-export default new UsersDAO()
+export default new NotificationsDAO()

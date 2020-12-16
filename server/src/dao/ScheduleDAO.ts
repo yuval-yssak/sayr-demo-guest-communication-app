@@ -12,8 +12,8 @@ export type ISchedule = WithId<{
   }[]
 }>
 
-class UsersDAO extends AbstractDAO<ISchedule> {
+class ScheduleDAO extends AbstractDAO<ISchedule> {
   COLLECTION_NAME = 'schedule'
 }
 
-export default new UsersDAO()
+export default new ScheduleDAO()
