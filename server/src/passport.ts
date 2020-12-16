@@ -20,7 +20,7 @@ async function connectOauthToDB(
   if (user) {
     // If the user is registered, update its profile along with the auth tokens
 
-    UsersDAO.updateOne(
+    await UsersDAO.updateOne(
       { _id: user._id },
       { $set: { oauth: { google: { profile, accessToken, refreshToken } } } }
     )
