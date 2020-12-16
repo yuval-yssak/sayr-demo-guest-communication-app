@@ -1,7 +1,7 @@
 import { WithId } from 'mongodb'
 import AbstractDAO from './AbstractDAO'
 
-export type ISchedule = WithId<{
+export type IChatMessage = WithId<{
   guest_id: number
   timestamp: Date
   text: string
@@ -9,7 +9,7 @@ export type ISchedule = WithId<{
   read: boolean
 }>
 
-class ChatMessagesDAO extends AbstractDAO<ISchedule> {
+class ChatMessagesDAO extends AbstractDAO<IChatMessage> {
   COLLECTION_NAME = 'chatMessages'
 }
 

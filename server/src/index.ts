@@ -8,6 +8,7 @@ import authRoutes from './routes/authRoutes'
 import app from './expressApp'
 import { AnnouncementResolver } from './graphql/resolvers/AnnouncementResolver'
 import { NotificationResolver } from './graphql/resolvers/NotificationResolver'
+import { DayActivitiesResolver } from './graphql/resolvers/DayActivitiesResolver'
 
 async function start() {
   await loadDataAccess()
@@ -18,7 +19,8 @@ async function start() {
         UserResolver,
         CompoundResolver,
         AnnouncementResolver,
-        NotificationResolver
+        NotificationResolver,
+        DayActivitiesResolver
       ]
     }),
     context: ({ req, res }) => ({ req, res })
