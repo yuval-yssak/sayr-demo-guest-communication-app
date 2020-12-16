@@ -26,6 +26,7 @@ import {
 } from '../../auth/auth'
 import requestEmailVerification from '../../emailVerification'
 import LoginResponse from '../schema/LoginResponse'
+import PersonsDAO from 'src/dao/PersonsDAO'
 
 @ObjectType()
 class Invitation {
@@ -158,6 +159,10 @@ class UserResolver {
       } else if (!user) {
         // create the new user record
 
+        // find relevant person
+        const personsWithThisEmail = await PersonsDAO.findArray({ email })
+        // TODO: handle case when more than one person has this email. Give prioirty if this person is in house.
+
         await UsersDAO.insertOne({
           email,
           login: {
@@ -171,7 +176,7 @@ class UserResolver {
           },
           invitationsSent: [],
           permissionLevel: PermissionLevel.None,
-          personId: null /* TODO: if email matches - bring in the proper id */,
+          personId: personsWithThisEmail?.[0].id,
           subscriptions: []
         })
         requestEmailVerification(email, requestID)
