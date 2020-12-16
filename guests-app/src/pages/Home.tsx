@@ -1,26 +1,129 @@
-import React from 'react'
+import * as React from 'react'
 import { observer } from 'mobx-react-lite'
-import { useQuery } from '../models/reactUtils'
-import Error from '../components/Error'
-
+import { StoreContext } from '../models/reactUtils'
+import { RootStoreType } from '../models'
 function Home() {
-  const { data, error } = useQuery(store => store.queryUsers())
+  const store = React.useContext(StoreContext)
+
   return (
     <>
       <p>Home</p>
-      {error && <Error error={error} />}
-      {data && (
-        <>
-          <p>Users</p>
-          {data.users.map(user => (
-            <li key={user.id}>
-              {user.id} {user.email}
-            </li>
-          ))}
-        </>
+      {store.loggedInUser && (
+        <button onClick={() => askForNotificationPermission(store)}>
+          Register for Notifications
+        </button>
       )}
     </>
   )
 }
 
 export default observer(Home)
+
+function askForNotificationPermission(store: RootStoreType) {
+  Notification.requestPermission(function (result) {
+    console.log('User Choice', result)
+    if (result !== 'granted') {
+      console.log('No notification permission granted!')
+    } else {
+      configurePushSub(store)
+      // displayConfirmNotification();
+    }
+  })
+}
+
+function configurePushSub(store: RootStoreType) {
+  if (!('serviceWorker' in navigator)) {
+    return
+  }
+
+  let reg: ServiceWorkerRegistration
+  navigator.serviceWorker.ready
+    .then(function (swreg) {
+      reg = swreg
+      return swreg.pushManager.getSubscription()
+    })
+    .then(function (sub) {
+      if (sub === null) {
+        // Create a new subscription
+        var vapidPublicKey =
+          'BFsdpKVL7oSeZspZ8Aa6pyaW1oQbI11bmd_-bpduPnS9_UT8DRhCp3gdTZ_2e9HpFrTfU-lqZuj98Tvvva2-Zdw'
+        var convertedVapidPublicKey = urlBase64ToUint8Array(vapidPublicKey)
+        return reg.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: convertedVapidPublicKey
+        })
+      } else {
+        return sub
+        // We have a subscription
+      }
+    })
+    .then(async function (newSub) {
+      const subscriptionObject: {
+        endpoint: string
+        expirationTime: unknown
+        keys: {
+          p256dh: string
+          auth: string
+        }
+      } = JSON.parse(JSON.stringify(newSub))
+      const query = await store.mutateCreateUserSubscription({
+        authKey: subscriptionObject.keys.auth,
+        endpoint: subscriptionObject.endpoint,
+        p256DhKey: subscriptionObject.keys.p256dh,
+        userAgent: navigator.userAgent,
+        userId: store.loggedInUser!.id
+      })
+      return { ok: true } // ??????
+    })
+    .then(function (res) {
+      if (res.ok) {
+        displayConfirmNotification()
+      }
+    })
+    .catch(function (err) {
+      console.log(err)
+    })
+}
+
+function urlBase64ToUint8Array(base64String: string) {
+  var padding = '='.repeat((4 - (base64String.length % 4)) % 4)
+  var base64 = (base64String + padding).replace(/\-/g, '+').replace(/_/g, '/')
+
+  var rawData = window.atob(base64)
+  var outputArray = new Uint8Array(rawData.length)
+
+  for (var i = 0; i < rawData.length; ++i) {
+    outputArray[i] = rawData.charCodeAt(i)
+  }
+  return outputArray
+}
+
+function displayConfirmNotification() {
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.ready.then(function (swreg) {
+      swreg.showNotification('Successfully subscribed!', {
+        body: 'You successfully subscribed to our Notification service!',
+        // icon: '/src/images/icons/app-icon-96x96.png',
+        // image: '/src/images/sf-boat.jpg',
+        dir: 'ltr',
+        lang: 'en-US', // BCP 47,
+        vibrate: [100, 50, 200],
+        // badge: '/src/images/icons/app-icon-96x96.png',
+        tag: 'confirm-notification',
+        renotify: true,
+        actions: [
+          {
+            action: 'confirm',
+            title: 'Okay'
+            // icon: '/src/images/icons/app-icon-96x96.png'
+          },
+          {
+            action: 'cancel',
+            title: 'Cancel'
+            // icon: '/src/images/icons/app-icon-96x96.png'
+          }
+        ]
+      })
+    })
+  }
+}

@@ -6,6 +6,9 @@ import { createHttpClient } from 'mst-gql'
 import { RootStore, StoreContext } from './models'
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary'
 import onStart from './onStart'
+import * as serviceWorkerRegistration from './serviceWorkerRegistration'
+
+serviceWorkerRegistration.register()
 
 const gqlHttpClient = createHttpClient('http://localhost:4000/graphql', {
   credentials: 'include',

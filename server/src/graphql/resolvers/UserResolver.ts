@@ -45,7 +45,7 @@ class Invitation {
 }
 
 @ObjectType()
-class Subscription {
+export class NotificationSubscription {
   @Field() userAgent: string
   @Field() endpoint: string
   @Field() p256dhKey: string
@@ -74,7 +74,8 @@ class AppUser extends User {
   @Field(() => Int, { nullable: true }) personId: number | null
   @Field() permissionLevel: PermissionLevel
   @Field(() => [Invitation]) invitationsSent: Invitation[]
-  @Field(() => [Subscription]) subscriptions: Subscription[]
+  @Field(() => [NotificationSubscription])
+  subscriptions: NotificationSubscription[]
 
   constructor(user: IUser) {
     super(user)
@@ -86,7 +87,7 @@ class AppUser extends User {
     )
     this.subscriptions = user.subscriptions.map(
       s =>
-        new Subscription({
+        new NotificationSubscription({
           userAgent: s.userAgent,
           endpoint: s.endpoint,
           p256dhKey: s.keys.p256dh,

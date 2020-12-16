@@ -16,7 +16,7 @@ function renderPage(view: IView) {
     case '/login':
       return <Login />
     default:
-      return 'Sry, not found'
+      return 'Sorry, not found'
   }
 }
 
