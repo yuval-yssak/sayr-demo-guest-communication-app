@@ -44,7 +44,7 @@ const authRoutes = (app: Express) => {
     (req: Request, res: Response) => {
       req.session!.user = req.user
 
-      res.redirect('http://localhost:8887/after-google-login')
+      res.redirect('http://localhost:3000/after-google-login')
     }
   )
 
@@ -82,7 +82,7 @@ const authRoutes = (app: Express) => {
         return
       }
       res.send(
-        '<p>Great, you are verified.</p><a href="http://localhost:8887">Click here to head on to the app.</a>'
+        '<p>Great, you are verified.</p><a href="http://localhost:3000">Click here to head on to the app.</a>'
       )
       // todo: redirect to automatically log the user in.
       return

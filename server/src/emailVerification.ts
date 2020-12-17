@@ -4,10 +4,10 @@ import { email as emailConfig } from '../config/config'
 
 setApiKey(emailConfig.sendGridAPI)
 
-const requestEmailVerification: (email: string, requestID: ObjectId) => void = (
-  email,
-  requestID
-) => {
+async function requestEmailVerification(
+  email: string,
+  requestID: ObjectId
+): Promise<void> {
   const msg = {
     to: email,
     from: 'iswara@sivananda.org',
@@ -15,14 +15,8 @@ const requestEmailVerification: (email: string, requestID: ObjectId) => void = (
     text: 'and easy to do anywhere, even with Node.js',
     html: `<p>Welcome to the authentication demo.</p><a href="http://localhost:4000/verify-email/${requestID}">Click here to verify your email address</a>`
   }
-
-  send(msg)
-    .then(() => {
-      console.log('Email sent')
-    })
-    .catch(error => {
-      console.error(error)
-    })
+  await send(msg)
+  console.log('Email sent')
 }
 
 export default requestEmailVerification

@@ -27,7 +27,7 @@ import passport from './passport'
 const app = express()
 
 app.use(cookieParser())
-app.use(cors({ credentials: true, origin: 'http://localhost:8887' }))
+app.use(cors({ credentials: true, origin: /^http:\/\/localhost:.*$/ }))
 
 // this session serves to hold the Oauth profile information
 // while the client is shifting between server and client URLs.

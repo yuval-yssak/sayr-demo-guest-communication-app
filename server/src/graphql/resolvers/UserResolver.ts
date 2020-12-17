@@ -26,7 +26,7 @@ import {
 } from '../../auth/auth'
 import requestEmailVerification from '../../emailVerification'
 import LoginResponse from '../schema/LoginResponse'
-import PersonsDAO from 'src/dao/PersonsDAO'
+import PersonsDAO from '../../dao/PersonsDAO'
 
 @ObjectType()
 class Invitation {
@@ -116,6 +116,7 @@ class UserResolver {
   @Query(() => [AppUser])
   async users() {
     const users = await UsersDAO.findArray({})
+    console.log('users', users)
     return users.map(user => new AppUser(user))
   }
 
@@ -160,8 +161,13 @@ class UserResolver {
         // create the new user record
 
         // find relevant person
-        const personsWithThisEmail = await PersonsDAO.findArray({ email })
         // TODO: handle case when more than one person has this email. Give prioirty if this person is in house.
+        const personsWithThisEmail = await PersonsDAO.findArray({ email })
+
+        const isThisFirstUser = (await UsersDAO.countDocuments()) === 0
+        const permissionLevel = isThisFirstUser
+          ? PermissionLevel.Admin
+          : PermissionLevel.None
 
         await UsersDAO.insertOne({
           email,
@@ -175,12 +181,12 @@ class UserResolver {
             tokenVersion: 0
           },
           invitationsSent: [],
-          permissionLevel: PermissionLevel.None,
+          permissionLevel,
           personId: personsWithThisEmail?.[0].id,
           subscriptions: []
         })
-        requestEmailVerification(email, requestID)
 
+        await requestEmailVerification(email, requestID)
         return true
       }
       // In case the user exists already with a password, ignore.

@@ -98,6 +98,10 @@ class AbstractDAO<TSchema> {
     return await this.collection.insertOne(doc, options)
   }
 
+  async countDocuments() {
+    return await this.collection.countDocuments()
+  }
+
   initializeUnorderedBulkOp() {
     return this.collection.initializeUnorderedBulkOp()
   }

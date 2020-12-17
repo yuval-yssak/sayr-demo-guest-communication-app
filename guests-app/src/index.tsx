@@ -15,7 +15,6 @@ const gqlHttpClient = createHttpClient('http://localhost:4000/graphql', {
   mode: 'cors'
 })
 
-console.log('1')
 const rootStore = RootStore.create(undefined, {
   gqlHttpClient
 })

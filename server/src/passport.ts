@@ -28,6 +28,11 @@ async function connectOauthToDB(
     // if the user has not registered before, create it and copy its profile.
 
     try {
+      const isThisFirstUser = (await UsersDAO.countDocuments()) === 0
+      const permissionLevel = isThisFirstUser
+        ? PermissionLevel.Admin
+        : PermissionLevel.None
+
       const insertResult = await UsersDAO.insertOne({
         email: profileEmail,
         login: {
@@ -36,7 +41,7 @@ async function connectOauthToDB(
           oauth: { google: { profile, accessToken, refreshToken } }
         },
         invitationsSent: [],
-        permissionLevel: PermissionLevel.None,
+        permissionLevel,
         personId: null,
         subscriptions: []
       })
