@@ -4,6 +4,7 @@ import {
   VerifyCallback,
   Profile
 } from 'passport-google-oauth20'
+import PersonsDAO from './dao/PersonsDAO'
 import UsersDAO, { PermissionLevel } from './dao/UsersDAO'
 
 async function connectOauthToDB(
@@ -28,6 +29,12 @@ async function connectOauthToDB(
     // if the user has not registered before, create it and copy its profile.
 
     try {
+      // find relevant person
+      // TODO: handle case when more than one person has this email. Give prioirty if this person is in house.
+      const personsWithThisEmail = await PersonsDAO.findArray({
+        email: profileEmail
+      })
+
       const isThisFirstUser = (await UsersDAO.countDocuments()) === 0
       const permissionLevel = isThisFirstUser
         ? PermissionLevel.Admin
@@ -42,7 +49,7 @@ async function connectOauthToDB(
         },
         invitationsSent: [],
         permissionLevel,
-        personId: null,
+        personId: personsWithThisEmail?.[0].id,
         subscriptions: []
       })
 

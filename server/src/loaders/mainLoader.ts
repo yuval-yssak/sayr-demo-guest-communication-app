@@ -7,6 +7,7 @@ import AnnouncementsDAO from '../dao/AnnouncementsDAO'
 import ChatMessagesDAO from '../dao/ChatMessagesDAO'
 import NotificationsDAO from '../dao/NotificationsDAO'
 import ScheduleDAO from '../dao/ScheduleDAO'
+import PersonsDAO from '../dao/PersonsDAO'
 
 let dbClient: MongoClient
 
@@ -20,6 +21,7 @@ async function loadDataAccess(customDBName?: string) {
   await ChatMessagesDAO.init(dbClient, resolvedDBName)
   await NotificationsDAO.init(dbClient, resolvedDBName)
   await ScheduleDAO.init(dbClient, resolvedDBName)
+  await PersonsDAO.init(dbClient, resolvedDBName)
 }
 
 async function closeDataAccess() {
