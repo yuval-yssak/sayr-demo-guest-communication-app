@@ -6,9 +6,9 @@ import Register from './pages/Register'
 import Login from './pages/Login'
 import Header from './components/Header'
 import Secret from './pages/Secret'
-import { ViewModelType } from './models/view'
+import { IView} from './models/View'
 
-function renderPage(view: ViewModelType) {
+function renderPage(view: IView) {
   switch (view.page) {
     case '/':
       return <Home />
@@ -19,7 +19,7 @@ function renderPage(view: ViewModelType) {
     case '/secret':
       return <Secret />
     default:
-      return 'Sry, not found'
+      return 'Sorry, not found'
   }
 }
 

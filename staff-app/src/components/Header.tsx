@@ -10,11 +10,15 @@ const Header: React.FC<Props> = () => {
   return (
     <>
       <header>
-        <button onClick={() => store.view.openHomepage()}>Home</button>
+        <button onClick={() => store.view.openHomePage()}>Home</button>
         <button onClick={() => store.view.openLoginPage()}>
           {store.loggedInUser ? 'Logout' : 'Login'}
         </button>
-        <button onClick={() => store.view.openRegisterPage()}>Register</button>
+        {!store.loggedInUser && (
+          <button onClick={() => store.view.openRegisterPage()}>
+            Register
+          </button>
+        )}
         <button onClick={() => store.view.openSecretPage()}>Secret</button>
       </header>
       <div>

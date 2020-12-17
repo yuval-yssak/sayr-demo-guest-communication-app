@@ -1,6 +1,6 @@
 import { Instance, destroy, flow } from 'mobx-state-tree'
 import { RootStoreBase } from './RootStore.base'
-import ViewModel from './view'
+import { View } from './View'
 import loggedInUser from './loggedInUser'
 import { localStorageMixin } from 'mst-gql'
 import { LoginResponseModelType } from '.'
@@ -8,7 +8,7 @@ import { LoginResponseModelType } from '.'
 export interface RootStoreType extends Instance<typeof RootStore.Type> {}
 
 export const RootStore = RootStoreBase.props({
-  view: ViewModel,
+  view: View,
   loggedInUser
 })
   .actions(self => ({
@@ -33,7 +33,7 @@ export const RootStore = RootStoreBase.props({
             })),
           error => console.error(error)
         )
-        .then(() => self.view.openHomepage())
+        .then(() => self.view.openHomePage())
       return query
     },
 
@@ -51,9 +51,9 @@ export const RootStore = RootStoreBase.props({
           accessToken: query.finishLoginWithGoogle.accessToken!
         })
       } catch (e) {
-        console.error('error on "finishe google login", ', e)
+        console.error('error on "finished google login", ', e)
       } finally {
-        self.view.openHomepage()
+        self.view.openHomePage()
       }
     }),
 
@@ -64,4 +64,6 @@ export const RootStore = RootStoreBase.props({
     }
   }))
 
-  .extend(localStorageMixin({ filter: ['loggedInUser'], throttle: 2000 }))
+  .extend(
+    localStorageMixin({ filter: ['loggedInUser', 'userTypes'], throttle: 2000 })
+  )
