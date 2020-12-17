@@ -77,6 +77,7 @@ class AppUser extends User {
   @Field(() => [Invitation]) invitationsSent: Invitation[]
   @Field(() => [NotificationSubscription])
   subscriptions: NotificationSubscription[]
+  @Field({ nullable: true }) profilePhoto?: string
 
   constructor(user: IUser) {
     super(user)
@@ -95,6 +96,8 @@ class AppUser extends User {
           authKey: s.keys.auth
         })
     )
+    this.profilePhoto = user.login.oauth?.google?.profile.photos?.[0].value
+
     console.log(this.subscriptions)
   }
 }
@@ -145,11 +148,15 @@ class UserResolver {
           { _id: user._id },
           {
             $set: {
-              password: hashedPassword,
-              emailVerification: {
-                verified: false,
-                requestExpiresOn: dayjs().add(2, 'day').toDate(),
-                requestID
+              login: {
+                password: hashedPassword,
+                emailVerification: {
+                  verified: false,
+                  requestExpiresOn: dayjs().add(2, 'day').toDate(),
+                  requestID
+                },
+                tokenVersion: 0,
+                oauth: user.login.oauth
               }
             }
           }

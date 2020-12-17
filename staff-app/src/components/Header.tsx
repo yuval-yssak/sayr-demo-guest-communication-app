@@ -20,6 +20,13 @@ const Header: React.FC<Props> = () => {
           </button>
         )}
         <button onClick={() => store.view.openSecretPage()}>Secret</button>
+        {store.loggedInUser &&
+          store.appUsers.get(store.loggedInUser.id)?.profilePhoto && (
+            <img
+              style={{ float: 'right' }}
+              src={store.appUsers.get(store.loggedInUser.id)?.profilePhoto}
+            />
+          )}{' '}
       </header>
       <div>
         {store.loggedInUser ? (

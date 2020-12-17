@@ -6,7 +6,7 @@ import Register from './pages/Register'
 import Login from './pages/Login'
 import Header from './components/Header'
 import Secret from './pages/Secret'
-import { IView} from './models/View'
+import { IView } from './models/View'
 
 function renderPage(view: IView) {
   switch (view.page) {
