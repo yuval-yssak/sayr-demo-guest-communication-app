@@ -12,6 +12,7 @@ const viewModel = types
       types.literal('/login'),
       types.literal('/register'),
       types.literal('/secret'),
+      types.literal('/guests'),
       types.literal('/custom')
     ),
     id: types.maybe(types.string)
@@ -44,6 +45,7 @@ const viewModel = types
     openLoginPage: () => (self.page = '/login'),
     openRegisterPage: () => (self.page = '/register'),
     openSecretPage: () => (self.page = '/secret'),
+    openGuestsPage: () => (self.page = '/guests'),
     setFromURL() {
       const newView = getViewFromURL() as Instance<typeof viewModel>
       console.log('setting from url', window.location.pathname, newView.page)

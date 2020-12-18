@@ -20,10 +20,17 @@ async function connectOauthToDB(
 
   if (user) {
     // If the user is registered, update its profile along with the auth tokens
-
+    console.log('updating oauth in passport')
     await UsersDAO.updateOne(
       { _id: user._id },
-      { $set: { oauth: { google: { profile, accessToken, refreshToken } } } }
+      {
+        $set: {
+          login: {
+            ...user.login,
+            oauth: { google: { profile, accessToken, refreshToken } }
+          }
+        }
+      }
     )
   } else if (!user) {
     // if the user has not registered before, create it and copy its profile.

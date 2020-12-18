@@ -1,10 +1,12 @@
 import CompoundRegistrationsDAO, {
+  IMatchedRegistration,
   IRegistration
 } from '../../dao/CompoundRegistrationsDAO'
 import { Resolver, Query, Arg } from 'type-graphql'
 import RegistrationResponse from '../schema/RegistrationResponse'
 import * as compoundUtils from '../../services/compoundUtils'
 import dayjs from 'dayjs'
+import UsersDAO from '../../dao/UsersDAO'
 
 function today() {
   return dayjs().format('YYYY-MM-DD')
@@ -26,9 +28,16 @@ export class CompoundResolver {
       }
     })
 
+    const users = await UsersDAO.findArray({
+      personId: {
+        $in: compounds.flatMap(c => c.persons?.map(p => p.id) || [])
+      }
+    })
     const allRegs = compounds.reduce(
-      (allRegs: IRegistration[], compound) =>
-        allRegs.concat(compoundUtils.getAllRegistrations(compound)),
+      (allRegs: IMatchedRegistration[], compound) =>
+        allRegs.concat(
+          compoundUtils.getAllRegistrations(compound) as IMatchedRegistration[]
+        ),
       []
     )
     return allRegs
@@ -39,7 +48,13 @@ export class CompoundResolver {
           reg.start_date <= today() &&
           reg.end_date >= today()
       )
-      .map(reg => new RegistrationResponse(reg))
+      .map(
+        reg =>
+          new RegistrationResponse(
+            reg,
+            users.find(u => u.personId === reg.person_id)
+          )
+      )
   }
 
   @Query(() => [RegistrationResponse])

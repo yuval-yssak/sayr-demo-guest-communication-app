@@ -96,6 +96,7 @@ export type ActivityInput = {
 /* The TypeScript type that explicits the refs to other models in order to prevent a circular refs issue */
 type Refs = {
   appUsers: ObservableMap<string, AppUserModelType>
+  registrationResponses: ObservableMap<string, RegistrationResponseModelType>
   activities: ObservableMap<string, ActivityModelType>
 }
 
@@ -147,13 +148,17 @@ export const RootStoreBase = withTypedRefs<Refs>()(
           ['Recipient', () => RecipientModel],
           ['Device', () => DeviceModel]
         ],
-        ['AppUser', 'Activity'],
+        ['AppUser', 'RegistrationResponse', 'Activity'],
         'js'
       )
     )
     .props({
       appUsers: types.optional(
         types.map(types.late((): any => AppUserModel)),
+        {}
+      ),
+      registrationResponses: types.optional(
+        types.map(types.late((): any => RegistrationResponseModel)),
         {}
       ),
       activities: types.optional(

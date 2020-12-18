@@ -2,9 +2,7 @@ import React, { useContext } from 'react'
 import { StoreContext } from '../models/reactUtils'
 import { observer } from 'mobx-react-lite'
 
-interface Props {}
-
-const Header: React.FC<Props> = () => {
+function Header() {
   const store = useContext(StoreContext)
 
   return (
@@ -20,13 +18,23 @@ const Header: React.FC<Props> = () => {
           </button>
         )}
         <button onClick={() => store.view.openSecretPage()}>Secret</button>
+        {store.loggedInUser && (
+          <>
+            <button onClick={() => store.view.openGuestsPage()}>Guests</button>
+          </>
+        )}
         {store.loggedInUser &&
           store.appUsers.get(store.loggedInUser.id)?.profilePhoto && (
-            <img
-              style={{ float: 'right' }}
-              src={store.appUsers.get(store.loggedInUser.id)?.profilePhoto}
-            />
-          )}{' '}
+            <>
+              <img
+                style={{ float: 'right' }}
+                alt="staff profile"
+                src={
+                  store.appUsers.get(store.loggedInUser.id)?.profilePhoto || ''
+                }
+              />
+            </>
+          )}
       </header>
       <div>
         {store.loggedInUser ? (

@@ -33,7 +33,7 @@ export const AppUserModelBase = ModelBase.named('AppUser')
       types.undefined,
       types.array(types.late((): any => NotificationSubscriptionModel))
     ),
-    profilePhoto: types.union(types.undefined, types.string)
+    profilePhoto: types.union(types.undefined, types.null, types.string)
   })
   .views(self => ({
     get store() {

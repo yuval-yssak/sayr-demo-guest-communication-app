@@ -71,7 +71,7 @@ export class NotificationSubscription {
 }
 
 @ObjectType()
-class AppUser extends User {
+export class AppUser extends User {
   @Field(() => Int, { nullable: true }) personId: number | null
   @Field() permissionLevel: PermissionLevel
   @Field(() => [Invitation]) invitationsSent: Invitation[]

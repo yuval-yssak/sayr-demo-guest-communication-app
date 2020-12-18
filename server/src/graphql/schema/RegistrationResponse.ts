@@ -1,21 +1,24 @@
 import { ObjectID } from 'mongodb'
 import {
   IItem,
+  IMatchedRegistration,
   IPayment,
   IRegistration,
   IRegistrationStatus
 } from '../../dao/CompoundRegistrationsDAO'
-import { Field, ObjectType } from 'type-graphql'
+import { Field, ObjectType, ID, Int } from 'type-graphql'
+import { AppUser, IUser } from '../resolvers/UserResolver'
 
 @ObjectType()
 export default class RegistrationResponse implements IRegistration {
-  @Field() id: number
+  @Field(_type => ID) id: number
   @Field() status: IRegistrationStatus
   @Field() submitted: string
   @Field() start_date: string
   @Field() end_date: string
   @Field() first_name: string
   @Field() last_name: string
+  @Field() spiritual_name: string
   @Field() email: string
   @Field() program: string
   @Field() program_id: number
@@ -29,6 +32,8 @@ export default class RegistrationResponse implements IRegistration {
   @Field() grand_total: number
   @Field() balance_due: number
   @Field() registration_total: number
+  @Field(_type => Int, { nullable: true }) person_id: number
+  @Field({ nullable: true }) userData?: AppUser
   questions: {
     [q: string]: string
   }
@@ -37,7 +42,7 @@ export default class RegistrationResponse implements IRegistration {
 
   _id: ObjectID
 
-  constructor(reg: IRegistration) {
+  constructor(reg: IRegistration | IMatchedRegistration, user?: IUser) {
     this.id = reg.id
     this.status = reg.status
     this.submitted = reg.submitted
@@ -45,6 +50,7 @@ export default class RegistrationResponse implements IRegistration {
     this.end_date = reg.end_date
     this.first_name = reg.first_name
     this.last_name = reg.last_name
+    this.spiritual_name = reg.questions.spiritual_name || ''
     this.email = reg.email
     this.program = reg.program
     this.program_id = reg.program_id
@@ -59,5 +65,7 @@ export default class RegistrationResponse implements IRegistration {
     this.balance_due = reg.balance_due
     this.registration_total = reg.registration_total
     this.questions = reg.questions
+    this.person_id = (reg as IMatchedRegistration).person_id
+    this.userData = user && new AppUser(user)
   }
 }
