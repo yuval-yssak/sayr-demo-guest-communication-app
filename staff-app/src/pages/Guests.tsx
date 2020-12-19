@@ -2,7 +2,6 @@ import * as React from 'react'
 import { observer } from 'mobx-react-lite'
 import { StoreContext } from '../models/reactUtils'
 import styled from 'styled-components'
-import Paper from '@material-ui/core/Paper'
 import Grid from '@material-ui/core/Grid'
 import { makeStyles, createStyles, Theme } from '@material-ui/core/styles'
 import Card from '@material-ui/core/Card'
@@ -13,6 +12,14 @@ import CardMedia from '@material-ui/core/CardMedia'
 import Button from '@material-ui/core/Button'
 import Typography from '@material-ui/core/Typography'
 import { PermissionLevel } from '../models'
+import UserDeviceSubscription from '../components/UserDeviceSubscription'
+import Table from '@material-ui/core/Table'
+import TableBody from '@material-ui/core/TableBody'
+import TableCell from '@material-ui/core/TableCell'
+import TableContainer from '@material-ui/core/TableContainer'
+import TableHead from '@material-ui/core/TableHead'
+import TableRow from '@material-ui/core/TableRow'
+import Paper from '@material-ui/core/Paper'
 
 const useStyles = makeStyles({
   root: {
@@ -67,17 +74,54 @@ function Guests() {
                       Room: {reg.room}
                       <br />
                       Registered:{' '}
-                      {reg.userData
-                        ? reg.userData.permissionLevel === 'None'
-                          ? 'As a guest'
-                          : 'As staff'
-                        : 'No'}
+                      {reg.userData ? (
+                        reg.userData.permissionLevel ===
+                        PermissionLevel.None ? (
+                          <>
+                            <span>As a guest</span>
+                            <p>Devices: </p>
+                            <TableContainer component={Paper}>
+                              <Table aria-label="simple table">
+                                <TableHead>
+                                  <TableRow>
+                                    <TableCell>Device Type</TableCell>
+                                    <TableCell align="right">Brand</TableCell>
+                                    <TableCell align="right">Model</TableCell>
+                                  </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                  {reg.userData.subscriptions?.map(s => (
+                                    <TableRow key={s.userAgent}>
+                                      <UserDeviceSubscription
+                                        userAgent={s.userAgent}
+                                      />
+                                    </TableRow>
+                                  ))}
+                                </TableBody>
+                              </Table>
+                            </TableContainer>{' '}
+                          </>
+                        ) : (
+                          'As staff'
+                        )
+                      ) : (
+                        'No'
+                      )}
                     </Typography>
                   </CardContent>
                 </CardActionArea>
                 <CardActions>
                   {!reg.userData && (
-                    <Button size="small" color="primary">
+                    <Button
+                      size="small"
+                      color="primary"
+                      onClick={() =>
+                        store.mutateInviteUser({
+                          email: reg.email!,
+                          staff: store.loggedInUser!.id
+                        })
+                      }
+                    >
                       Invite
                     </Button>
                   )}

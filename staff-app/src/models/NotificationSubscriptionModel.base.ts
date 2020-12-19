@@ -19,10 +19,7 @@ export const NotificationSubscriptionModelBase = ModelBase.named(
       types.literal('NotificationSubscription'),
       'NotificationSubscription'
     ),
-    userAgent: types.union(types.undefined, types.string),
-    endpoint: types.union(types.undefined, types.string),
-    p256dhKey: types.union(types.undefined, types.string),
-    authKey: types.union(types.undefined, types.string)
+    userAgent: types.union(types.undefined, types.string)
   })
   .views(self => ({
     get store() {
@@ -34,19 +31,10 @@ export class NotificationSubscriptionModelSelector extends QueryBuilder {
   get userAgent() {
     return this.__attr(`userAgent`)
   }
-  get endpoint() {
-    return this.__attr(`endpoint`)
-  }
-  get p256dhKey() {
-    return this.__attr(`p256dhKey`)
-  }
-  get authKey() {
-    return this.__attr(`authKey`)
-  }
 }
 export function selectFromNotificationSubscription() {
   return new NotificationSubscriptionModelSelector()
 }
 
 export const notificationSubscriptionModelPrimitives = selectFromNotificationSubscription()
-  .userAgent.endpoint.p256dhKey.authKey
+  .userAgent

@@ -8,8 +8,7 @@ import {
   registerEnumType,
   InputType,
   Field,
-  ObjectType,
-  Int
+  ObjectType
 } from 'type-graphql'
 import { compare, hash } from 'bcryptjs'
 import { ObjectID, ObjectId } from 'mongodb'
@@ -30,14 +29,14 @@ import LoginResponse from '../schema/LoginResponse'
 @ObjectType()
 class Invitation {
   @Field() timestamp: Date
-  @Field(_type => Int) staffPersonId: number
+  @Field(_type => String) staffPersonId: ObjectId
 
   constructor({
     timestamp,
     staffPersonId
   }: {
     timestamp: Date
-    staffPersonId: number
+    staffPersonId: ObjectId
   }) {
     this.timestamp = timestamp
     this.staffPersonId = staffPersonId
@@ -47,9 +46,9 @@ class Invitation {
 @ObjectType()
 export class NotificationSubscription {
   @Field() userAgent: string
-  @Field() endpoint: string
-  @Field() p256dhKey: string
-  @Field() authKey: string
+  endpoint: string
+  p256dhKey: string
+  authKey: string
 
   constructor({
     userAgent,
@@ -71,7 +70,7 @@ export class NotificationSubscription {
 
 @ObjectType()
 export class AppUser extends User {
-  @Field() permissionLevel: PermissionLevel
+  @Field(_type => PermissionLevel) permissionLevel: PermissionLevel
   @Field(() => [Invitation]) invitationsSent: Invitation[]
   @Field(() => [NotificationSubscription])
   subscriptions: NotificationSubscription[]
@@ -292,6 +291,27 @@ class UserResolver {
         }
       }
     )
+    return result.result.ok === 1
+  }
+
+  @Mutation(() => Boolean)
+  async inviteUser(
+    @Arg('email') email: string,
+    @Arg('staff', _type => String) staffID: string
+  ): Promise<boolean> {
+    const [alreadyExists] = await UsersDAO.findArray({ email })
+    if (alreadyExists) return false
+
+    const result = await UsersDAO.insertOne({
+      email,
+      invitationsSent: [
+        { staff: new ObjectId(staffID), timestamp: new Date() }
+      ],
+      permissionLevel: PermissionLevel.None,
+      login: { password: null, tokenVersion: 1 },
+      subscriptions: []
+    })
+
     return result.result.ok === 1
   }
 }

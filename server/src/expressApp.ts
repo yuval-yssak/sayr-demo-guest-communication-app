@@ -41,7 +41,7 @@ app.use(
     saveUninitialized: false,
     cookie: {
       maxAge: 1000 * 5, // 5 seconds only. Cookie should die after client first redirect
-      secure: process.env.NODE_ENV === 'production'
+      secure: false // todo: change to: process.env.NODE_ENV === 'production'
     }
   })
 )

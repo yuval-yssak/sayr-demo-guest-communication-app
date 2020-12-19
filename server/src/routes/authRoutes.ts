@@ -1,6 +1,7 @@
 import { Request, Response, Express } from 'express'
 import { ObjectId } from 'mongodb'
 import passport from 'passport'
+import { AuthenticateOptionsGoogle } from 'passport-google-oauth20'
 import { exchangeToken } from '../auth/auth'
 import UsersDAO from '../dao/UsersDAO'
 
@@ -10,41 +11,61 @@ const authRoutes = (app: Express) => {
   app.post('/refresh-token', exchangeToken)
 
   app.get(
-    '/login-with-google',
-    passport.authenticate('google', {
+    '/guest-app/login-with-google',
+    passport.authenticate('guest-app-google', {
       scope: ['profile', 'email'],
       accessType: 'offline',
       includeGrantedScopes: true
-    })
+    } as AuthenticateOptionsGoogle)
   )
 
   app.get(
-    '/google/AllowCalendar',
-    passport.authenticate('google', {
-      scope: ['https://www.googleapis.com/auth/calendar.events'],
+    '/staff-app/login-with-google',
+    passport.authenticate('staff-app-google', {
+      scope: ['profile', 'email'],
       accessType: 'offline',
       includeGrantedScopes: true
-    })
+    } as AuthenticateOptionsGoogle)
   )
 
+  // app.get(
+  //   '/google/AllowCalendar',
+  //   passport.authenticate('google', {
+  //     scope: ['https://www.googleapis.com/auth/calendar.events'],
+  //     accessType: 'offline',
+  //     includeGrantedScopes: true
+  //   })
+  // )
+
+  // app.get(
+  //   '/google/AllowDrive',
+  //   passport.authenticate('google', {
+  //     scope: ['https://www.googleapis.com/auth/drive'],
+  //     accessType: 'offline',
+  //     includeGrantedScopes: true
+  //   })
+  // )
+
+  // store server-side cookie session for 5 seconds and
+  // redirect the client back to the client app.
   app.get(
-    '/google/AllowDrive',
-    passport.authenticate('google', {
-      scope: ['https://www.googleapis.com/auth/drive'],
-      accessType: 'offline',
-      includeGrantedScopes: true
-    })
+    '/guest-app/login-with-google/callback',
+    passport.authenticate('guest-app-google', { session: false }),
+    (req: Request, res: Response) => {
+      req.session!.user = req.user
+      res.redirect('http://localhost:3000/after-google-login')
+    }
   )
 
   // store server-side cookie session for 5 seconds and
   // redirect the client back to the client app.
   app.get(
-    '/login-with-google/callback',
-    passport.authenticate('google', { session: false }),
+    '/staff-app/login-with-google/callback',
+    passport.authenticate('staff-app-google', { session: false }),
     (req: Request, res: Response) => {
       req.session!.user = req.user
-
-      res.redirect('http://localhost:3000/after-google-login')
+      console.log('/login-with-google/callback ', req)
+      res.redirect('http://localhost:8887/after-google-login')
     }
   )
 

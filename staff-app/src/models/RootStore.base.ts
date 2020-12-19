@@ -84,7 +84,7 @@ import { deviceModelPrimitives, DeviceModelSelector } from './DeviceModel.base'
 import { PermissionLevel } from './PermissionLevelEnum'
 
 export type PersonInput = {
-  id: number
+  id: string
 }
 export type ActivityInput = {
   from: string
@@ -120,6 +120,7 @@ export enum RootStoreBaseMutations {
   mutateRevokeRefreshTokensForUser = 'mutateRevokeRefreshTokensForUser',
   mutateUpdateUserPermission = 'mutateUpdateUserPermission',
   mutateCreateUserSubscription = 'mutateCreateUserSubscription',
+  mutateInviteUser = 'mutateInviteUser',
   mutateCreateAnnouncement = 'mutateCreateAnnouncement',
   mutateInvalidateAnnouncement = 'mutateInvalidateAnnouncement',
   mutateCreateNotificationsForAnnouncement = 'mutateCreateNotificationsForAnnouncement',
@@ -378,6 +379,16 @@ export const RootStoreBase = withTypedRefs<Refs>()(
       ) {
         return self.mutate<{ createUserSubscription: boolean }>(
           `mutation createUserSubscription($authKey: String!, $p256DhKey: String!, $endpoint: String!, $userAgent: String!, $userId: String!) { createUserSubscription(authKey: $authKey, p256dhKey: $p256DhKey, endpoint: $endpoint, userAgent: $userAgent, userId: $userId) }`,
+          variables,
+          optimisticUpdate
+        )
+      },
+      mutateInviteUser(
+        variables: { staff: string; email: string },
+        optimisticUpdate?: () => void
+      ) {
+        return self.mutate<{ inviteUser: boolean }>(
+          `mutation inviteUser($staff: String!, $email: String!) { inviteUser(staff: $staff, email: $email) }`,
           variables,
           optimisticUpdate
         )

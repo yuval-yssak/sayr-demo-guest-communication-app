@@ -77,4 +77,12 @@ export default function onStart(
           .subscriptions(s => s.userAgent)
     )
   )
+  rootStore.queryUpcomingArrivals({ inUpcomingDays: 14 }, s =>
+    s.spiritual_name.first_name.last_name.room.program.email.headshotUrl.userData(
+      u =>
+        u.profilePhoto
+          .invitationsSent(i => i.staffPersonId.timestamp)
+          .subscriptions(s => s.userAgent)
+    )
+  )
 }

@@ -12,6 +12,7 @@ import {
   NotificationSubscriptionModelType
 } from './NotificationSubscriptionModel'
 import { NotificationSubscriptionModelSelector } from './NotificationSubscriptionModel.base'
+import { PermissionLevelEnumType } from './PermissionLevelEnum'
 import { RootStoreType } from './index'
 
 /**
@@ -23,7 +24,7 @@ export const AppUserModelBase = ModelBase.named('AppUser')
     __typename: types.optional(types.literal('AppUser'), 'AppUser'),
     id: types.identifier,
     email: types.union(types.undefined, types.string),
-    permissionLevel: types.union(types.undefined, types.string),
+    permissionLevel: types.union(types.undefined, PermissionLevelEnumType),
     invitationsSent: types.union(
       types.undefined,
       types.array(types.late((): any => InvitationModel))

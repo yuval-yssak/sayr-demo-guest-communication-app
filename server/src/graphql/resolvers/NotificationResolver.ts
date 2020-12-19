@@ -1,5 +1,5 @@
-import { Resolver, Arg, Mutation, Field, InputType, Int } from 'type-graphql'
-import { ObjectID } from 'mongodb'
+import { Resolver, Arg, Mutation, Field, InputType } from 'type-graphql'
+import { ObjectId } from 'mongodb'
 import NotificationResponse from '../schema/NotificationResponse'
 import NotificationsDAO, { INotification } from '../../dao/NotificationsDAO'
 import UsersDAO from '../../dao/UsersDAO'
@@ -8,8 +8,8 @@ import webPush from 'web-push'
 
 @InputType()
 class PersonInput {
-  @Field(() => Int)
-  id: number
+  @Field(() => String)
+  id: string
 }
 
 console.log(PersonInput)
@@ -21,10 +21,10 @@ export class NotificationResolver {
     @Arg('announcementID') announcementID: string
   ): Promise<NotificationResponse[]> {
     const [anAnnouncement] = await AnnouncementsDAO.findArray({
-      _id: new ObjectID(announcementID)
+      _id: new ObjectId(announcementID)
     })
     const users = await UsersDAO.findArray({
-      personId: { $in: persons.map(p => p.id) }
+      _id: { $in: persons.map(p => new ObjectId(p.id)) }
     })
     const usersWithSubscriptions = users.filter(
       user => user.subscriptions.length
@@ -49,7 +49,7 @@ export class NotificationResolver {
           )
         })
         return await NotificationsDAO.insertOne({
-          parentAnnouncement: new ObjectID(announcementID),
+          parentAnnouncement: new ObjectId(announcementID),
           recipient: {
             id: user._id,
             devices: user.subscriptions.map(sub => ({
@@ -65,7 +65,7 @@ export class NotificationResolver {
     const resultArray = results.flatMap(result => result.ops as INotification[])
 
     const [announcement] = await AnnouncementsDAO.findArray({
-      _id: new ObjectID(announcementID)
+      _id: new ObjectId(announcementID)
     })
     // create notifications entries with the endpoints, set status to initial
 

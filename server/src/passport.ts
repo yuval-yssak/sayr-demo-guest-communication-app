@@ -69,12 +69,26 @@ async function connectOauthToDB(
 }
 
 passport.use(
+  'guest-app-google',
   new GoogleStrategy(
     {
       clientID:
         '1053321495897-vgj5hu2dqo1utpps5mqnrt0tfn160955.apps.googleusercontent.com',
       clientSecret: '33dKswmH65gXmZCWm10e_r42',
-      callbackURL: 'http://localhost:4000/login-with-google/callback'
+      callbackURL: 'http://localhost:4000/guest-app/login-with-google/callback'
+    },
+    connectOauthToDB
+  )
+)
+
+passport.use(
+  'staff-app-google',
+  new GoogleStrategy(
+    {
+      clientID:
+        '1053321495897-vgj5hu2dqo1utpps5mqnrt0tfn160955.apps.googleusercontent.com',
+      clientSecret: '33dKswmH65gXmZCWm10e_r42',
+      callbackURL: 'http://localhost:4000/staff-app/login-with-google/callback'
     },
     connectOauthToDB
   )

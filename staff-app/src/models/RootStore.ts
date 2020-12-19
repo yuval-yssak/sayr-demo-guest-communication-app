@@ -38,7 +38,9 @@ export const RootStore = RootStoreBase.props({
     },
 
     loginWithGoogle() {
-      window.location.replace('http://localhost:4000/login-with-google')
+      window.location.replace(
+        'http://localhost:4000/staff-app/login-with-google'
+      )
     },
 
     finishGoogleLogin: flow(function* () {
