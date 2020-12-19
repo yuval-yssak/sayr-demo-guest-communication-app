@@ -16,7 +16,7 @@ import { RootStoreType } from './index'
 export const RecipientModelBase = ModelBase.named('Recipient')
   .props({
     __typename: types.optional(types.literal('Recipient'), 'Recipient'),
-    id: types.union(types.undefined, types.number),
+    id: types.identifier,
     devices: types.union(
       types.undefined,
       types.array(types.late((): any => DeviceModel))

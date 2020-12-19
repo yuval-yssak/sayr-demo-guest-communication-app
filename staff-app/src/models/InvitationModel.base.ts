@@ -15,7 +15,7 @@ export const InvitationModelBase = ModelBase.named('Invitation')
   .props({
     __typename: types.optional(types.literal('Invitation'), 'Invitation'),
     timestamp: types.union(types.undefined, types.frozen()),
-    staffPersonId: types.union(types.undefined, types.number)
+    staffPersonId: types.union(types.undefined, types.integer)
   })
   .views(self => ({
     get store() {

@@ -6,8 +6,9 @@ import {
   IRegistration,
   IRegistrationStatus
 } from '../../dao/CompoundRegistrationsDAO'
-import { Field, ObjectType, ID, Int } from 'type-graphql'
+import { Field, ObjectType, ID, Int, Float } from 'type-graphql'
 import { AppUser, IUser } from '../resolvers/UserResolver'
+import { IPerson } from 'src/dao/PersonsDAO'
 
 @ObjectType()
 export default class RegistrationResponse implements IRegistration {
@@ -21,17 +22,18 @@ export default class RegistrationResponse implements IRegistration {
   @Field() spiritual_name: string
   @Field() email: string
   @Field() program: string
-  @Field() program_id: number
-  @Field() room_id: number
+  @Field(_type => Int) program_id: number
+  @Field(_type => Int) room_id: number
   @Field(() => String, { nullable: true }) room: string | null
-  @Field() lodging_id: number
+  @Field(_type => Int) lodging_id: number
   @Field(() => String, { nullable: true }) lodging: string | null
-  @Field() total_items: number
-  @Field() total_payments: number
-  @Field() total_taxes: number
-  @Field() grand_total: number
-  @Field() balance_due: number
-  @Field() registration_total: number
+  @Field(_type => Float) total_items: number
+  @Field(_type => Float) total_payments: number
+  @Field(_type => Float) total_taxes: number
+  @Field(_type => Float) grand_total: number
+  @Field(_type => Float) balance_due: number
+  @Field({ nullable: true }) headshotUrl?: string
+  @Field(_type => Float) registration_total: number
   @Field(_type => Int, { nullable: true }) person_id: number
   @Field({ nullable: true }) userData?: AppUser
   questions: {
@@ -42,7 +44,15 @@ export default class RegistrationResponse implements IRegistration {
 
   _id: ObjectID
 
-  constructor(reg: IRegistration | IMatchedRegistration, user?: IUser) {
+  constructor({
+    reg,
+    person,
+    user
+  }: {
+    reg: IRegistration | IMatchedRegistration
+    person?: IPerson
+    user?: IUser
+  }) {
     this.id = reg.id
     this.status = reg.status
     this.submitted = reg.submitted
@@ -66,6 +76,13 @@ export default class RegistrationResponse implements IRegistration {
     this.registration_total = reg.registration_total
     this.questions = reg.questions
     this.person_id = (reg as IMatchedRegistration).person_id
+    this.headshotUrl = convertHeadshotUrl(person?.questions['headshot-url'])
     this.userData = user && new AppUser(user)
   }
+}
+
+function convertHeadshotUrl(url: string | undefined) {
+  if (url === undefined) return
+  if (/dropbox\.com/.test(url)) return url.replace(/dl=0/, 'raw=1')
+  else return url
 }

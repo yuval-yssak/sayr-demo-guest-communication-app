@@ -1,7 +1,7 @@
 import { WithId } from 'mongodb'
 import AbstractDAO from './AbstractDAO'
 
-export type IPersons = WithId<{
+export type IPerson = WithId<{
   id: number
   full_name: string
   first_name: string
@@ -13,10 +13,11 @@ export type IPersons = WithId<{
     lastname: string
     email: string
     'spiritual-name'?: string
+    'headshot-url': string
   }
 }>
 
-class PersonsDAO extends AbstractDAO<IPersons> {
+class PersonsDAO extends AbstractDAO<IPerson> {
   COLLECTION_NAME = 'persons'
 }
 

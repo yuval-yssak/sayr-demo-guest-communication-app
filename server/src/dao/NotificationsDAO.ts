@@ -1,4 +1,4 @@
-import { ObjectID, WithId } from 'mongodb'
+import { ObjectId, WithId } from 'mongodb'
 import AbstractDAO from './AbstractDAO'
 
 export type INotificationStatus =
@@ -8,10 +8,10 @@ export type INotificationStatus =
   | 'ignored'
   | 'failed'
 export type INotification = WithId<{
-  parentAnnouncement: ObjectID
+  parentAnnouncement: ObjectId
   timestamp: Date
   recipient: {
-    id: number
+    id: ObjectId
     devices: {
       endpoint: string
       status: INotificationStatus

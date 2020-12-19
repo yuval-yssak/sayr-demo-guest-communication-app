@@ -98,6 +98,7 @@ type Refs = {
   appUsers: ObservableMap<string, AppUserModelType>
   registrationResponses: ObservableMap<string, RegistrationResponseModelType>
   activities: ObservableMap<string, ActivityModelType>
+  recipients: ObservableMap<string, RecipientModelType>
 }
 
 /**
@@ -118,7 +119,6 @@ export enum RootStoreBaseMutations {
   mutateFinishLoginWithGoogle = 'mutateFinishLoginWithGoogle',
   mutateRevokeRefreshTokensForUser = 'mutateRevokeRefreshTokensForUser',
   mutateUpdateUserPermission = 'mutateUpdateUserPermission',
-  mutateAssociateUserWithPerson = 'mutateAssociateUserWithPerson',
   mutateCreateUserSubscription = 'mutateCreateUserSubscription',
   mutateCreateAnnouncement = 'mutateCreateAnnouncement',
   mutateInvalidateAnnouncement = 'mutateInvalidateAnnouncement',
@@ -148,7 +148,7 @@ export const RootStoreBase = withTypedRefs<Refs>()(
           ['Recipient', () => RecipientModel],
           ['Device', () => DeviceModel]
         ],
-        ['AppUser', 'RegistrationResponse', 'Activity'],
+        ['AppUser', 'RegistrationResponse', 'Activity', 'Recipient'],
         'js'
       )
     )
@@ -163,6 +163,10 @@ export const RootStoreBase = withTypedRefs<Refs>()(
       ),
       activities: types.optional(
         types.map(types.late((): any => ActivityModel)),
+        {}
+      ),
+      recipients: types.optional(
+        types.map(types.late((): any => RecipientModel)),
         {}
       )
     })
@@ -228,7 +232,7 @@ export const RootStoreBase = withTypedRefs<Refs>()(
         return self.query<{
           upcomingArrivals: RegistrationResponseModelType[]
         }>(
-          `query upcomingArrivals($inUpcomingDays: Float) { upcomingArrivals(inUpcomingDays: $inUpcomingDays) {
+          `query upcomingArrivals($inUpcomingDays: Int) { upcomingArrivals(inUpcomingDays: $inUpcomingDays) {
         ${
           typeof resultSelector === 'function'
             ? resultSelector(new RegistrationResponseModelSelector()).toString()
@@ -353,21 +357,11 @@ export const RootStoreBase = withTypedRefs<Refs>()(
         )
       },
       mutateUpdateUserPermission(
-        variables: { permissionLevel: PermissionLevel; personId: number },
+        variables: { permissionLevel: PermissionLevel; email: string },
         optimisticUpdate?: () => void
       ) {
         return self.mutate<{ updateUserPermission: boolean }>(
-          `mutation updateUserPermission($permissionLevel: PermissionLevel!, $personId: Float!) { updateUserPermission(permissionLevel: $permissionLevel, personId: $personId) }`,
-          variables,
-          optimisticUpdate
-        )
-      },
-      mutateAssociateUserWithPerson(
-        variables: { personId: number; userId: string },
-        optimisticUpdate?: () => void
-      ) {
-        return self.mutate<{ associateUserWithPerson: boolean }>(
-          `mutation associateUserWithPerson($personId: Float!, $userId: String!) { associateUserWithPerson(personId: $personId, userId: $userId) }`,
+          `mutation updateUserPermission($permissionLevel: PermissionLevel!, $email: String!) { updateUserPermission(permissionLevel: $permissionLevel, email: $email) }`,
           variables,
           optimisticUpdate
         )

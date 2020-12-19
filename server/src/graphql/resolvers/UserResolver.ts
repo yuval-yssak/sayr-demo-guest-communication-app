@@ -26,12 +26,11 @@ import {
 } from '../../auth/auth'
 import requestEmailVerification from '../../emailVerification'
 import LoginResponse from '../schema/LoginResponse'
-import PersonsDAO from '../../dao/PersonsDAO'
 
 @ObjectType()
 class Invitation {
   @Field() timestamp: Date
-  @Field() staffPersonId: number
+  @Field(_type => Int) staffPersonId: number
 
   constructor({
     timestamp,
@@ -72,7 +71,6 @@ export class NotificationSubscription {
 
 @ObjectType()
 export class AppUser extends User {
-  @Field(() => Int, { nullable: true }) personId: number | null
   @Field() permissionLevel: PermissionLevel
   @Field(() => [Invitation]) invitationsSent: Invitation[]
   @Field(() => [NotificationSubscription])
@@ -82,7 +80,6 @@ export class AppUser extends User {
   constructor(user: IUser) {
     super(user)
     console.log(user)
-    this.personId = user.personId
     this.permissionLevel = user.permissionLevel
     this.invitationsSent = user.invitationsSent.map(
       i => new Invitation({ timestamp: i.timestamp, staffPersonId: i.staff })
@@ -167,10 +164,6 @@ class UserResolver {
       } else if (!user) {
         // create the new user record
 
-        // find relevant person
-        // TODO: handle case when more than one person has this email. Give prioirty if this person is in house.
-        const personsWithThisEmail = await PersonsDAO.findArray({ email })
-
         const isThisFirstUser = (await UsersDAO.countDocuments()) === 0
         const permissionLevel = isThisFirstUser
           ? PermissionLevel.Admin
@@ -189,7 +182,6 @@ class UserResolver {
           },
           invitationsSent: [],
           permissionLevel,
-          personId: personsWithThisEmail?.[0].id,
           subscriptions: []
         })
 
@@ -266,36 +258,16 @@ class UserResolver {
 
   @Mutation(() => Boolean)
   async updateUserPermission(
-    @Arg('personId') personId: number,
+    @Arg('email') email: string,
     @Arg('permissionLevel', _type => PermissionLevel)
     permissionLevel: PermissionLevel
   ): Promise<boolean> {
     const result = await UsersDAO.updateOne(
-      { personId },
+      { email },
       { $set: { permissionLevel } }
     )
     return result.result.ok === 1
   }
-
-  @Mutation(() => Boolean)
-  async associateUserWithPerson(
-    @Arg('userId') userId: string,
-    @Arg('personId') personId: number
-  ): Promise<boolean> {
-    const result = await UsersDAO.updateOne(
-      { _id: new ObjectID(userId) },
-      { $set: { personId } }
-    )
-
-    return result.result.ok === 1
-  }
-
-  // PushSubscription {
-  //   endpoint: string;
-  //   keys: {
-  //       p256dh: string;
-  //       auth: string;
-  //   }
 
   @Mutation(() => Boolean)
   async createUserSubscription(

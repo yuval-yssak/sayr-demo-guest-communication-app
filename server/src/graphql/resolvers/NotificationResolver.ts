@@ -51,7 +51,7 @@ export class NotificationResolver {
         return await NotificationsDAO.insertOne({
           parentAnnouncement: new ObjectID(announcementID),
           recipient: {
-            id: user.personId!,
+            id: user._id,
             devices: user.subscriptions.map(sub => ({
               status: 'initialized',
               endpoint: sub.endpoint

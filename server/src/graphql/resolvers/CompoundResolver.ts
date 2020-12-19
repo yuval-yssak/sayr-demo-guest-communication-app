@@ -2,11 +2,12 @@ import CompoundRegistrationsDAO, {
   IMatchedRegistration,
   IRegistration
 } from '../../dao/CompoundRegistrationsDAO'
-import { Resolver, Query, Arg } from 'type-graphql'
+import { Resolver, Query, Arg, Int } from 'type-graphql'
 import RegistrationResponse from '../schema/RegistrationResponse'
 import * as compoundUtils from '../../services/compoundUtils'
 import dayjs from 'dayjs'
 import UsersDAO from '../../dao/UsersDAO'
+import PersonsDAO from '../../dao/PersonsDAO'
 
 function today() {
   return dayjs().format('YYYY-MM-DD')
@@ -17,27 +18,41 @@ export class CompoundResolver {
   @Query(() => [RegistrationResponse])
   async guestsInHouse(): //Promise<void> {
   Promise<RegistrationResponse[]> {
+    const inHouseQuery = {
+      status: { $ne: 'cancelled' },
+      start_date: { $lte: today() },
+      end_date: { $gte: today() },
+      room: { $exists: true, $ne: '' }
+    }
     const compounds = await CompoundRegistrationsDAO.findArray({
-      'persons.registrations': {
-        $elemMatch: {
-          status: { $ne: 'cancelled' },
-          start_date: { $lte: today() },
-          end_date: { $gte: today() },
-          room: { $exists: true, $ne: '' }
-        }
+      $or: [
+        { 'persons.registrations': { $elemMatch: inHouseQuery } },
+        { unmatchedRegistrations: { $elemMatch: inHouseQuery } }
+      ]
+    })
+    console.log('query', {
+      $or: [
+        { 'persons.registrations': { $elemMatch: inHouseQuery } },
+        { unmatchedRegistrations: { $elemMatch: inHouseQuery } }
+      ]
+    })
+    const users = await UsersDAO.findArray({
+      email: {
+        $in: compounds.flatMap(
+          c => c.persons?.flatMap(p => p.registrations.map(r => r.email)) || []
+        )
       }
     })
 
-    const users = await UsersDAO.findArray({
-      personId: {
-        $in: compounds.flatMap(c => c.persons?.map(p => p.id) || [])
+    const persons = await PersonsDAO.findArray({
+      id: {
+        $in:
+          (compounds.flatMap(c => c.persons?.map(p => p.id)) as number[]) || []
       }
     })
     const allRegs = compounds.reduce(
-      (allRegs: IMatchedRegistration[], compound) =>
-        allRegs.concat(
-          compoundUtils.getAllRegistrations(compound) as IMatchedRegistration[]
-        ),
+      (allRegs: IRegistration[], compound) =>
+        allRegs.concat(compoundUtils.getAllRegistrations(compound)),
       []
     )
     return allRegs
@@ -50,28 +65,49 @@ export class CompoundResolver {
       )
       .map(
         reg =>
-          new RegistrationResponse(
+          new RegistrationResponse({
             reg,
-            users.find(u => u.personId === reg.person_id)
-          )
+            person: persons.find(
+              p => p.id === (reg as IMatchedRegistration)?.person_id
+            ),
+            user: users.find(u => u.email === reg.email)
+          })
       )
   }
 
   @Query(() => [RegistrationResponse])
   async upcomingArrivals(
-    @Arg('inUpcomingDays', { defaultValue: 2 }) inUpcomingDays: number
+    @Arg('inUpcomingDays', _type => Int, { defaultValue: 2 })
+    inUpcomingDays: number
   ): Promise<RegistrationResponse[]> {
     console.log('arrivals in upcoming ' + inUpcomingDays)
+    const query = {
+      status: { $ne: 'cancelled' },
+      start_date: {
+        $gte: today(),
+        $lte: dayjs().add(inUpcomingDays, 'day').format('YYYY-MM-DD')
+      },
+      room: { $exists: true, $ne: '' }
+    }
     const compounds = await CompoundRegistrationsDAO.findArray({
-      'persons.registrations': {
-        $elemMatch: {
-          status: { $ne: 'cancelled' },
-          start_date: {
-            $gte: today(),
-            $lte: dayjs().add(inUpcomingDays, 'day').format('YYYY-MM-DD')
-          },
-          room: { $exists: true, $ne: '' }
-        }
+      $or: [
+        { 'persons.registrations': { $elemMatch: query } },
+        { unmatchedRegistrations: { $elemMatch: query } }
+      ]
+    })
+
+    const persons = await PersonsDAO.findArray({
+      id: {
+        $in:
+          (compounds.flatMap(c => c.persons?.map(p => p.id)) as number[]) || []
+      }
+    })
+
+    const users = await UsersDAO.findArray({
+      email: {
+        $in: compounds.flatMap(
+          c => c.persons?.flatMap(p => p.registrations.map(r => r.email)) || []
+        )
       }
     })
 
@@ -89,6 +125,15 @@ export class CompoundResolver {
             dayjs().add(inUpcomingDays, 'day').format('YYYY-MM-DD') &&
           reg.start_date >= today()
       )
-      .map(reg => new RegistrationResponse(reg))
+      .map(
+        reg =>
+          new RegistrationResponse({
+            reg,
+            person: persons.find(
+              p => p.id === (reg as IMatchedRegistration)?.person_id
+            ),
+            user: users.find(u => u.email === reg.email)
+          })
+      )
   }
 }

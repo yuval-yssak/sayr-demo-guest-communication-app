@@ -23,7 +23,6 @@ export const AppUserModelBase = ModelBase.named('AppUser')
     __typename: types.optional(types.literal('AppUser'), 'AppUser'),
     id: types.identifier,
     email: types.union(types.undefined, types.string),
-    personId: types.union(types.undefined, types.null, types.integer),
     permissionLevel: types.union(types.undefined, types.string),
     invitationsSent: types.union(
       types.undefined,
@@ -47,9 +46,6 @@ export class AppUserModelSelector extends QueryBuilder {
   }
   get email() {
     return this.__attr(`email`)
-  }
-  get personId() {
-    return this.__attr(`personId`)
   }
   get permissionLevel() {
     return this.__attr(`permissionLevel`)
@@ -84,5 +80,5 @@ export function selectFromAppUser() {
   return new AppUserModelSelector()
 }
 
-export const appUserModelPrimitives = selectFromAppUser().email.personId
-  .permissionLevel.profilePhoto
+export const appUserModelPrimitives = selectFromAppUser().email.permissionLevel
+  .profilePhoto

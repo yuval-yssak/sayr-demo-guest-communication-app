@@ -35,16 +35,17 @@ export const RegistrationResponseModelBase = withTypedRefs<Refs>()(
       spiritual_name: types.union(types.undefined, types.string),
       email: types.union(types.undefined, types.string),
       program: types.union(types.undefined, types.string),
-      program_id: types.union(types.undefined, types.number),
-      room_id: types.union(types.undefined, types.number),
+      program_id: types.union(types.undefined, types.integer),
+      room_id: types.union(types.undefined, types.integer),
       room: types.union(types.undefined, types.null, types.string),
-      lodging_id: types.union(types.undefined, types.number),
+      lodging_id: types.union(types.undefined, types.integer),
       lodging: types.union(types.undefined, types.null, types.string),
       total_items: types.union(types.undefined, types.number),
       total_payments: types.union(types.undefined, types.number),
       total_taxes: types.union(types.undefined, types.number),
       grand_total: types.union(types.undefined, types.number),
       balance_due: types.union(types.undefined, types.number),
+      headshotUrl: types.union(types.undefined, types.null, types.string),
       registration_total: types.union(types.undefined, types.number),
       person_id: types.union(types.undefined, types.null, types.integer),
       userData: types.union(
@@ -121,6 +122,9 @@ export class RegistrationResponseModelSelector extends QueryBuilder {
   get balance_due() {
     return this.__attr(`balance_due`)
   }
+  get headshotUrl() {
+    return this.__attr(`headshotUrl`)
+  }
   get registration_total() {
     return this.__attr(`registration_total`)
   }
@@ -143,5 +147,5 @@ export function selectFromRegistrationResponse() {
 export const registrationResponseModelPrimitives = selectFromRegistrationResponse()
   .status.submitted.start_date.end_date.first_name.last_name.spiritual_name
   .email.program.program_id.room_id.room.lodging_id.lodging.total_items
-  .total_payments.total_taxes.grand_total.balance_due.registration_total
-  .person_id
+  .total_payments.total_taxes.grand_total.balance_due.headshotUrl
+  .registration_total.person_id

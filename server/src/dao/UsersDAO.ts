@@ -17,7 +17,6 @@ export enum PermissionLevel {
 }
 
 export type IUser = WithId<{
-  personId: number | null
   email: string
   permissionLevel: PermissionLevel
   login: {
