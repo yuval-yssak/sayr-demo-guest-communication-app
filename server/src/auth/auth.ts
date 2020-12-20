@@ -59,7 +59,8 @@ function installRefreshTokenCookie(refreshToken: string, res: Response) {
     httpOnly: true,
     path: '/refresh-token',
     secure: process.env.NODE_ENV === 'production',
-    maxAge: 1000 * 60 * 60 * 24 * 7
+    maxAge: 1000 * 60 * 60 * 24 * 7,
+    sameSite: 'none'
   })
 }
 
@@ -69,7 +70,9 @@ function removeRefreshTokenCookie(res: Response) {
   res.clearCookie('rx', {
     httpOnly: true,
     path: '/refresh-token',
-    secure: process.env.NODE_ENV === 'production'
+    secure: process.env.NODE_ENV === 'production',
+    maxAge: 1000 * 60 * 60 * 24 * 7,
+    sameSite: 'none'
   })
 }
 

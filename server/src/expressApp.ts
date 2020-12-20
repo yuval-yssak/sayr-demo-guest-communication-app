@@ -23,7 +23,8 @@ import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import session from 'express-session'
 import passport from './passport'
-import { session as sessionConfig } from './config/config'
+import { session as sessionConfig, mongoDBConfig } from './config/config'
+import ConnectMondbSession from 'connect-mongodb-session'
 
 const app = express()
 
@@ -39,19 +40,46 @@ app.use(
   })
 )
 
+const MongoDBStore = ConnectMondbSession(session)
+const store = new MongoDBStore({
+  uri: mongoDBConfig.DBUrl,
+  databaseName: mongoDBConfig.dbName,
+  collection: 'mySessions'
+})
+
+store.on('error', function (error) {
+  console.log(error)
+})
+
+// let redisClient = redis.createClient()
+
+/**
+ * In Heroku, all requests come into the application as plain http but they have
+ * the header X-Forwarded-Proto to know whether the original request was http or
+ * https. That causes express to see non-ssl traffic and so it refuses to set a
+ * secure cookie when running on Heroku. Express will only send secure cookies
+ * over https. You have to tell express to trust the information in the
+ * X-Forwarded-Proto header, i.e. that the original request was over https,
+ * by enabling the 'trust proxy' setting.
+ */
+app.set('trust proxy', 1)
+
 // this session serves to hold the Oauth profile information
 // while the client is shifting between server and client URLs.
 // After the redirect to the client rendering app, the client calls the mutation
 // "finishLoginWithGoogle" in which it gets the access and refresh tokens.
+
 app.use(
   session({
+    store,
     secret: sessionConfig.secret,
     name: 'oauth-bridge',
     resave: false,
     saveUninitialized: false,
     cookie: {
       maxAge: 1000 * 5, // 5 seconds only. Cookie should die after client first redirect
-      secure: false // todo: change to: process.env.NODE_ENV === 'production'
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'none'
     }
   })
 )

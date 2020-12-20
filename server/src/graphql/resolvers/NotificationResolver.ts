@@ -13,7 +13,6 @@ class PersonInput {
   id: string
 }
 
-console.log(PersonInput)
 @Resolver()
 export class NotificationResolver {
   @Mutation(() => [NotificationResponse])

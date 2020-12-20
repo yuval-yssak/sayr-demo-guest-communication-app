@@ -34,7 +34,7 @@ const authRoutes = (app: Express) => {
     '/guest-app/login-with-google/callback',
     passport.authenticate('guest-app-google', { session: false }),
     (req: Request, res: Response) => {
-      req.session!.user = req.user
+      ;(req.session as any).user = req.user
       res.redirect(
         `${process.env.CLIENT_GUEST_APP_BASE_URL}/after-google-login`
       )
@@ -47,7 +47,8 @@ const authRoutes = (app: Express) => {
     '/staff-app/login-with-google/callback',
     passport.authenticate('staff-app-google', { session: false }),
     (req: Request, res: Response) => {
-      req.session!.user = req.user
+      ;(req.session as any).user = req.user
+
       res.redirect(
         `${process.env.CLIENT_STAFF_APP_BASE_URL}/after-google-login`
       )

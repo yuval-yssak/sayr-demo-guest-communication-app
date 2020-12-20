@@ -78,7 +78,6 @@ export class AppUser extends User {
 
   constructor(user: IUser) {
     super(user)
-    console.log(user)
     this.permissionLevel = user.permissionLevel
     this.invitationsSent = user.invitationsSent.map(
       i => new Invitation({ timestamp: i.timestamp, staffPersonId: i.staff })
@@ -93,8 +92,6 @@ export class AppUser extends User {
         })
     )
     this.profilePhoto = user.login.oauth?.google?.profile.photos?.[0].value
-
-    console.log(this.subscriptions)
   }
 }
 
@@ -115,7 +112,6 @@ class UserResolver {
   @Query(() => [AppUser])
   async users() {
     const users = await UsersDAO.findArray({})
-    console.log('users', users)
     return users.map(user => new AppUser(user))
   }
 
@@ -234,7 +230,7 @@ class UserResolver {
   async finishLoginWithGoogle(
     @Ctx() { req, res }: MyContext
   ): Promise<LoginResponse> {
-    const user = req.session?.user as IUser
+    const user = (req.session as any).user as IUser
     if (!user) throw new Error('server session is empty')
     const accessToken = createAccessToken(user)
     const refreshToken = createRefreshToken(user)
@@ -247,7 +243,6 @@ class UserResolver {
   async revokeRefreshTokensForUser(
     @Arg('userId', () => String) userId: string
   ) {
-    console.log(userId)
     const result = await UsersDAO.updateOne(
       { _id: new ObjectId(userId) },
       { $inc: { tokenVersion: 1 } }

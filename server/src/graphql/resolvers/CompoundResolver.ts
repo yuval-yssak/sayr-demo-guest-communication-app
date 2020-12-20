@@ -30,12 +30,6 @@ export class CompoundResolver {
         { unmatchedRegistrations: { $elemMatch: inHouseQuery } }
       ]
     })
-    console.log('query', {
-      $or: [
-        { 'persons.registrations': { $elemMatch: inHouseQuery } },
-        { unmatchedRegistrations: { $elemMatch: inHouseQuery } }
-      ]
-    })
     const users = await UsersDAO.findArray({
       email: {
         $in: compounds.flatMap(
@@ -80,7 +74,6 @@ export class CompoundResolver {
     @Arg('inUpcomingDays', _type => Int, { defaultValue: 2 })
     inUpcomingDays: number
   ): Promise<RegistrationResponse[]> {
-    console.log('arrivals in upcoming ' + inUpcomingDays)
     const query = {
       status: { $ne: 'cancelled' },
       start_date: {
