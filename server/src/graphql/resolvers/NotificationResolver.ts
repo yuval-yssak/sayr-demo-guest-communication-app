@@ -5,7 +5,7 @@ import NotificationsDAO, { INotification } from '../../dao/NotificationsDAO'
 import UsersDAO from '../../dao/UsersDAO'
 import AnnouncementsDAO from '../../dao/AnnouncementsDAO'
 import webPush from 'web-push'
-import { webPushVapid } from '../../../config/config'
+import { webPushVapid } from '../../config/config'
 
 @InputType()
 class PersonInput {

@@ -50,10 +50,11 @@
     "web-push": "^3.4.4"
   },
   "scripts": {
-    "start": "ts-node src/index.ts",
+    "start": "node dist/index.js",
     "dev": "ts-node-dev src/index.ts",
-    "publishToHeroku": "cd ../ && git subtree push --prefix server heroku changing-projects || true",
+    "publishToHeroku": "cd ../ && git subtree push --prefix server heroku main || true",
     "test": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' mocha -r ts-node/register 'tests/**/*.ts'",
-    "tslint": "tslint --project ."
+    "tslint": "tslint --project .",
+    "postinstall": "tsc"
   }
 }

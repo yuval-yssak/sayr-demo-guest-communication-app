@@ -1,6 +1,6 @@
 import { MongoClient } from 'mongodb'
 
-import { mongoDBConfig } from '../../config/config'
+import { mongoDBConfig } from '../config/config'
 
 async function connect() {
   const client = new MongoClient(mongoDBConfig.DBUrl, {

@@ -23,7 +23,7 @@ import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import session from 'express-session'
 import passport from './passport'
-import { session as sessionConfig } from '../config/config'
+import { session as sessionConfig } from './config/config'
 
 const app = express()
 

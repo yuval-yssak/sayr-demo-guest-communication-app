@@ -1,6 +1,6 @@
 import { setApiKey, send } from '@sendgrid/mail'
 import { ObjectId } from 'mongodb'
-import { email as emailConfig } from '../config/config'
+import { email as emailConfig } from './config/config'
 
 setApiKey(emailConfig.sendGridAPI)
 

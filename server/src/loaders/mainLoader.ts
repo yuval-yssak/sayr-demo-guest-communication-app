@@ -1,4 +1,4 @@
-import { mongoDBConfig } from '../../config/config'
+import { mongoDBConfig } from '../config/config'
 import { MongoClient } from 'mongodb'
 import { connect } from './mongoClient'
 import UsersDAO from '../dao/UsersDAO'

@@ -1,6 +1,6 @@
 import { ObjectType, Field, ID } from 'type-graphql'
 import { ObjectId } from 'mongodb'
-import { jwt } from '../../config/config'
+import { jwt } from '../config/config'
 import { sign } from 'jsonwebtoken'
 
 import { Request, Response } from 'express'

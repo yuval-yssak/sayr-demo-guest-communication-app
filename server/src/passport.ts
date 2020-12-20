@@ -5,7 +5,7 @@ import {
   Profile
 } from 'passport-google-oauth20'
 import UsersDAO, { PermissionLevel } from './dao/UsersDAO'
-import { googleOAuthStaffApp, googleOAuthGuestApp } from '../config/config'
+import { googleOAuthStaffApp, googleOAuthGuestApp } from './config/config'
 
 async function connectOauthToDB(
   accessToken: string,
