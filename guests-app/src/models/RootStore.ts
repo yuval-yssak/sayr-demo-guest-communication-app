@@ -39,7 +39,7 @@ export const RootStore = RootStoreBase.props({
 
     loginWithGoogle() {
       window.location.replace(
-        'http://localhost:4000/guest-app/login-with-google'
+        `${process.env.REACT_APP_SERVER_BASE_URL}/guest-app/login-with-google`
       )
     },
 

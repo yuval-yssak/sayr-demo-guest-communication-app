@@ -51,7 +51,7 @@ const loggedInUser = types.maybeNull(
     .actions(self => ({
       refreshToken: flow(function* refreshToken() {
         const response: Response = yield fetch(
-          'http://localhost:4000/refresh-token',
+          `${process.env.REACT_APP_SERVER_BASE_URL}/refresh-token`,
           {
             method: 'POST',
             credentials: 'include'

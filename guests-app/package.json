@@ -26,10 +26,10 @@
     "web-vitals": "^0.2.4"
   },
   "scripts": {
-    "start": "env DISABLE_NEW_JSX_TRANSFORM=true react-scripts start",
-    "build": "env DISABLE_NEW_JSX_TRANSFORM=true react-scripts build",
-    "test": "env DISABLE_NEW_JSX_TRANSFORM=true react-scripts test",
-    "eject": "env DISABLE_NEW_JSX_TRANSFORM=true react-scripts eject"
+    "start": "env DISABLE_NEW_JSX_TRANSFORM=true REACT_APP_SERVER_BASE_URL=https://arcane-ridge-67692.herokuapp.com react-scripts start",
+    "build": "env DISABLE_NEW_JSX_TRANSFORM=true REACT_APP_SERVER_BASE_URL=https://arcane-ridge-67692.herokuapp.com react-scripts build",
+    "test": "env DISABLE_NEW_JSX_TRANSFORM=true REACT_APP_SERVER_BASE_URL=https://arcane-ridge-67692.herokuapp.com react-scripts test",
+    "eject": "env DISABLE_NEW_JSX_TRANSFORM=true REACT_APP_SERVER_BASE_URL=https://arcane-ridge-67692.herokuapp.com react-scripts eject"
   },
   "eslintConfig": {
     "extends": [

@@ -10,10 +10,13 @@ import * as serviceWorkerRegistration from './serviceWorkerRegistration'
 
 serviceWorkerRegistration.register()
 
-const gqlHttpClient = createHttpClient('http://localhost:4000/graphql', {
-  credentials: 'include',
-  mode: 'cors'
-})
+const gqlHttpClient = createHttpClient(
+  `${process.env.REACT_APP_SERVER_BASE_URL}/graphql`,
+  {
+    credentials: 'include',
+    mode: 'cors'
+  }
+)
 
 const rootStore = RootStore.create(undefined, {
   gqlHttpClient
