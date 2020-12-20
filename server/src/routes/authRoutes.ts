@@ -28,24 +28,6 @@ const authRoutes = (app: Express) => {
     } as AuthenticateOptionsGoogle)
   )
 
-  // app.get(
-  //   '/google/AllowCalendar',
-  //   passport.authenticate('google', {
-  //     scope: ['https://www.googleapis.com/auth/calendar.events'],
-  //     accessType: 'offline',
-  //     includeGrantedScopes: true
-  //   })
-  // )
-
-  // app.get(
-  //   '/google/AllowDrive',
-  //   passport.authenticate('google', {
-  //     scope: ['https://www.googleapis.com/auth/drive'],
-  //     accessType: 'offline',
-  //     includeGrantedScopes: true
-  //   })
-  // )
-
   // store server-side cookie session for 5 seconds and
   // redirect the client back to the client app.
   app.get(
@@ -53,7 +35,9 @@ const authRoutes = (app: Express) => {
     passport.authenticate('guest-app-google', { session: false }),
     (req: Request, res: Response) => {
       req.session!.user = req.user
-      res.redirect('http://localhost:3000/after-google-login')
+      res.redirect(
+        `${process.env.CLIENT_GUEST_APP_BASE_URL}/after-google-login`
+      )
     }
   )
 
@@ -64,8 +48,9 @@ const authRoutes = (app: Express) => {
     passport.authenticate('staff-app-google', { session: false }),
     (req: Request, res: Response) => {
       req.session!.user = req.user
-      console.log('/login-with-google/callback ', req)
-      res.redirect('http://localhost:8887/after-google-login')
+      res.redirect(
+        `${process.env.CLIENT_STAFF_APP_BASE_URL}/after-google-login`
+      )
     }
   )
 
