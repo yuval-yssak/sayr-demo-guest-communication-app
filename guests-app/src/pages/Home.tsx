@@ -35,7 +35,7 @@ function configurePushSub(store: RootStoreType) {
   if (!('serviceWorker' in navigator)) {
     return
   }
-
+  console.log('halfway to configure push subscription')
   let reg: ServiceWorkerRegistration
   navigator.serviceWorker.ready
     .then(function (swreg) {
@@ -44,6 +44,7 @@ function configurePushSub(store: RootStoreType) {
     })
     .then(function (sub) {
       if (sub === null) {
+        console.log('creating new subscription')
         // Create a new subscription
         var vapidPublicKey =
           'BFsdpKVL7oSeZspZ8Aa6pyaW1oQbI11bmd_-bpduPnS9_UT8DRhCp3gdTZ_2e9HpFrTfU-lqZuj98Tvvva2-Zdw'
@@ -53,6 +54,7 @@ function configurePushSub(store: RootStoreType) {
           applicationServerKey: convertedVapidPublicKey
         })
       } else {
+        console.log('got existing subscription')
         return sub
         // We have a subscription
       }
@@ -60,12 +62,13 @@ function configurePushSub(store: RootStoreType) {
     .then(async function (newSub) {
       const subscriptionObject: {
         endpoint: string
-        expirationTime: unknown
+        // expirationTime: unknown
         keys: {
           p256dh: string
           auth: string
         }
       } = JSON.parse(JSON.stringify(newSub))
+      console.log('before mutation')
       const query = await store.mutateCreateUserSubscription({
         authKey: subscriptionObject.keys.auth,
         endpoint: subscriptionObject.endpoint,
@@ -77,6 +80,7 @@ function configurePushSub(store: RootStoreType) {
     })
     .then(function (res) {
       if (res.ok) {
+        console.log('everything ok, displaying confirmation notification')
         displayConfirmNotification()
       }
     })

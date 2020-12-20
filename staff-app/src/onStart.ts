@@ -74,7 +74,7 @@ export default function onStart(
       u =>
         u.profilePhoto
           .invitationsSent(i => i.staffPersonId.timestamp)
-          .subscriptions(s => s.userAgent)
+          .subscriptions(s => s.userAgent).email.permissionLevel
     )
   )
   rootStore.queryUpcomingArrivals({ inUpcomingDays: 14 }, s =>
@@ -82,7 +82,9 @@ export default function onStart(
       u =>
         u.profilePhoto
           .invitationsSent(i => i.staffPersonId.timestamp)
-          .subscriptions(s => s.userAgent)
+          .subscriptions(s => s.userAgent).email.permissionLevel
     )
   )
+
+  rootStore.queryGetAllValidAnnouncements({})
 }

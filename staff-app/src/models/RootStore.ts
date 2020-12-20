@@ -63,6 +63,22 @@ export const RootStore = RootStoreBase.props({
       console.log('logging out')
       self.mutateLogout()
       self.loggedInUser && destroy(self.loggedInUser)
+    },
+
+    createNewAnnouncement({
+      subject,
+      body,
+      imageUrl
+    }: {
+      subject: string
+      body: string
+      imageUrl: string
+    }) {
+      self.mutateCreateAnnouncement({
+        body,
+        subject,
+        image: imageUrl ?? undefined
+      })
     }
   }))
 

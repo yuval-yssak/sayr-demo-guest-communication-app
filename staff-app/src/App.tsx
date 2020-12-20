@@ -8,6 +8,7 @@ import Header from './components/Header'
 import Secret from './pages/Secret'
 import Guests from './pages/Guests'
 import { IView } from './models/View'
+import Announcements from './pages/Announcements'
 
 function renderPage(view: IView) {
   switch (view.page) {
@@ -21,6 +22,8 @@ function renderPage(view: IView) {
       return <Secret />
     case '/guests':
       return <Guests />
+    case '/announcements':
+      return <Announcements />
     default:
       return 'Sorry, not found'
   }

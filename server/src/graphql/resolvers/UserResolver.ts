@@ -235,7 +235,7 @@ class UserResolver {
     @Ctx() { req, res }: MyContext
   ): Promise<LoginResponse> {
     const user = req.session?.user as IUser
-
+    if (!user) throw new Error('server session is empty')
     const accessToken = createAccessToken(user)
     const refreshToken = createRefreshToken(user)
     console.log('new refresh token is ', refreshToken)

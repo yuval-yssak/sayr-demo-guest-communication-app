@@ -1,4 +1,4 @@
-import { Instance } from 'mobx-state-tree'
+import { getRoot, Instance } from 'mobx-state-tree'
 import { AnnouncementResponseModelBase } from './AnnouncementResponseModel.base'
 
 /* The TypeScript type of an instance of AnnouncementResponseModel */
@@ -20,6 +20,11 @@ export const AnnouncementResponseModel = AnnouncementResponseModelBase.actions(
     // This is an auto-generated example action.
     log() {
       console.log(JSON.stringify(self))
+    },
+    setInvalid() {
+      ;(getRoot(self) as any).mutateInvalidateAnnouncement({ id: self.id })
+
+      self.valid = false
     }
   })
 )

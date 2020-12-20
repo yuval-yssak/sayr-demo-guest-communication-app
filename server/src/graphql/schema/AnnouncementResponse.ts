@@ -4,7 +4,8 @@ import { ObjectID } from 'mongodb'
 
 @ObjectType()
 export default class AnnouncementResponse implements IAnnouncement {
-  @Field(() => ID) _id: ObjectID
+  _id: ObjectID
+  @Field(() => ID) id: ObjectID
   @Field() subject: string
   @Field() body: string
   @Field({ nullable: true }) image?: string
@@ -13,7 +14,7 @@ export default class AnnouncementResponse implements IAnnouncement {
   @Field() updated_at: Date
 
   constructor(announcement: IAnnouncement) {
-    this._id = announcement._id
+    this.id = this._id = announcement._id
     this.subject = announcement.subject
     this.body = announcement.body
     this.image = announcement.image

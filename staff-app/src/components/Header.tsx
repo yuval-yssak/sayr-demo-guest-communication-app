@@ -21,6 +21,9 @@ function Header() {
         {store.loggedInUser && (
           <>
             <button onClick={() => store.view.openGuestsPage()}>Guests</button>
+            <button onClick={() => store.view.openAnnouncementsPage()}>
+              Announcements
+            </button>
           </>
         )}
         {store.loggedInUser &&

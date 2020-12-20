@@ -16,6 +16,7 @@ import { RootStoreType } from './index'
 
 /* The TypeScript type that explicits the refs to other models in order to prevent a circular refs issue */
 type Refs = {
+  parentAnnouncement: AnnouncementResponseModelType
   recipient: RecipientModelType
 }
 
@@ -30,10 +31,10 @@ export const NotificationResponseModelBase = withTypedRefs<Refs>()(
         types.literal('NotificationResponse'),
         'NotificationResponse'
       ),
-      _id: types.identifier,
+      id: types.identifier,
       parentAnnouncement: types.union(
         types.undefined,
-        types.late((): any => AnnouncementResponseModel)
+        MSTGQLRef(types.late((): any => AnnouncementResponseModel))
       ),
       timestamp: types.union(types.undefined, types.frozen()),
       recipient: types.union(
@@ -49,8 +50,8 @@ export const NotificationResponseModelBase = withTypedRefs<Refs>()(
 )
 
 export class NotificationResponseModelSelector extends QueryBuilder {
-  get _id() {
-    return this.__attr(`_id`)
+  get id() {
+    return this.__attr(`id`)
   }
   get timestamp() {
     return this.__attr(`timestamp`)
@@ -83,4 +84,4 @@ export function selectFromNotificationResponse() {
 }
 
 export const notificationResponseModelPrimitives = selectFromNotificationResponse()
-  ._id.timestamp
+  .timestamp

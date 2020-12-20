@@ -97,7 +97,9 @@ export type ActivityInput = {
 type Refs = {
   appUsers: ObservableMap<string, AppUserModelType>
   registrationResponses: ObservableMap<string, RegistrationResponseModelType>
+  announcementResponses: ObservableMap<string, AnnouncementResponseModelType>
   activities: ObservableMap<string, ActivityModelType>
+  notificationResponses: ObservableMap<string, NotificationResponseModelType>
   recipients: ObservableMap<string, RecipientModelType>
 }
 
@@ -149,7 +151,14 @@ export const RootStoreBase = withTypedRefs<Refs>()(
           ['Recipient', () => RecipientModel],
           ['Device', () => DeviceModel]
         ],
-        ['AppUser', 'RegistrationResponse', 'Activity', 'Recipient'],
+        [
+          'AppUser',
+          'RegistrationResponse',
+          'AnnouncementResponse',
+          'Activity',
+          'NotificationResponse',
+          'Recipient'
+        ],
         'js'
       )
     )
@@ -162,8 +171,16 @@ export const RootStoreBase = withTypedRefs<Refs>()(
         types.map(types.late((): any => RegistrationResponseModel)),
         {}
       ),
+      announcementResponses: types.optional(
+        types.map(types.late((): any => AnnouncementResponseModel)),
+        {}
+      ),
       activities: types.optional(
         types.map(types.late((): any => ActivityModel)),
+        {}
+      ),
+      notificationResponses: types.optional(
+        types.map(types.late((): any => NotificationResponseModel)),
         {}
       ),
       recipients: types.optional(

@@ -19,7 +19,7 @@ export const AnnouncementResponseModelBase = ModelBase.named(
       types.literal('AnnouncementResponse'),
       'AnnouncementResponse'
     ),
-    _id: types.identifier,
+    id: types.identifier,
     subject: types.union(types.undefined, types.string),
     body: types.union(types.undefined, types.string),
     image: types.union(types.undefined, types.null, types.string),
@@ -34,8 +34,8 @@ export const AnnouncementResponseModelBase = ModelBase.named(
   }))
 
 export class AnnouncementResponseModelSelector extends QueryBuilder {
-  get _id() {
-    return this.__attr(`_id`)
+  get id() {
+    return this.__attr(`id`)
   }
   get subject() {
     return this.__attr(`subject`)
@@ -61,4 +61,4 @@ export function selectFromAnnouncementResponse() {
 }
 
 export const announcementResponseModelPrimitives = selectFromAnnouncementResponse()
-  ._id.subject.body.image.valid.created_at.updated_at
+  .subject.body.image.valid.created_at.updated_at

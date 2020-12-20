@@ -28,7 +28,8 @@ export class Recipient {
 
 @ObjectType()
 export default class NotificationResponse {
-  @Field(() => ID) _id: ObjectId
+  _id: ObjectId
+  @Field(() => ID) id: ObjectId
   @Field() parentAnnouncement: AnnouncementResponse
   @Field() timestamp: Date
   @Field() recipient: Recipient
@@ -45,8 +46,10 @@ export default class NotificationResponse {
       }[]
     }
   }) {
-    this._id = notification._id
-    this.parentAnnouncement = notification.parentAnnouncement
+    this._id = this.id = notification._id
+    this.parentAnnouncement = new AnnouncementResponse(
+      notification.parentAnnouncement
+    )
     this.timestamp = notification.timestamp
     this.recipient = new Recipient(notification.recipient)
   }
