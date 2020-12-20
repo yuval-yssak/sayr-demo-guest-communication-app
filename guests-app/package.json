@@ -27,6 +27,7 @@
   },
   "scripts": {
     "start": "env DISABLE_NEW_JSX_TRANSFORM=true REACT_APP_SERVER_BASE_URL=https://arcane-ridge-67692.herokuapp.com react-scripts start",
+    "start-local": "env DISABLE_NEW_JSX_TRANSFORM=true REACT_APP_SERVER_BASE_URL=http://localhost:4000 react-scripts start",
     "build": "env DISABLE_NEW_JSX_TRANSFORM=true REACT_APP_SERVER_BASE_URL=https://arcane-ridge-67692.herokuapp.com react-scripts build",
     "test": "env DISABLE_NEW_JSX_TRANSFORM=true REACT_APP_SERVER_BASE_URL=https://arcane-ridge-67692.herokuapp.com react-scripts test",
     "eject": "env DISABLE_NEW_JSX_TRANSFORM=true REACT_APP_SERVER_BASE_URL=https://arcane-ridge-67692.herokuapp.com react-scripts eject"
