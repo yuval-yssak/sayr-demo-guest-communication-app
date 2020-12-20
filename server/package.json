@@ -52,6 +52,7 @@
   "scripts": {
     "start": "ts-node src/index.ts",
     "dev": "ts-node-dev src/index.ts",
+    "publishToHeroku": "cd ../ && git subtree push --prefix server heroku changing-projects || true",
     "test": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' mocha -r ts-node/register 'tests/**/*.ts'",
     "tslint": "tslint --project ."
   }

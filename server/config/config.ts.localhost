@@ -1,0 +1,35 @@
+const mongoDBConfig = {
+  dbName: 'guest-communication',
+  DBUrl: 'mongodb://localhost'
+  // , DBUrl: 'mongodb+srv://midbar-user:YNpxAuxn8Tpueq2@midbar-cluster.bqcy5.mongodb.net?retryWrites=true&w=majority'
+}
+
+const jwt = {
+  secretKeyForAccess: 'bydr28uldil8q7330rpy47y0a5w0c9uw0hzw9le24myk5vcviozcoma',
+  secretKeyForRefresh: 'znsx6anpfj8vnplxdbxr68ijdfnusgrtpo1zdacyhqmnhcusfcy9xs'
+}
+
+const email = {
+  sendGridAPI:
+    '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'
+}
+
+const session = {
+  secret: 'b1a8qzzuzpvw8jewx2vysqqh2hq8lcgwqyd92j01ol'
+}
+
+const googleOAuth = {
+  clientID:
+    '1053321495897-vgj5hu2dqo1utpps5mqnrt0tfn160955.apps.googleusercontent.com',
+  clientSecret: '33dKswmH65gXmZCWm10e_r42',
+  callbackURL: 'http://localhost:4000/guest-app/login-with-google/callback'
+}
+
+const webPushVapid = {
+  subject: 'https://sivanandabahamas.org',
+  publicKey:
+    'BFsdpKVL7oSeZspZ8Aa6pyaW1oQbI11bmd_-bpduPnS9_UT8DRhCp3gdTZ_2e9HpFrTfU-lqZuj98Tvvva2-Zdw',
+  privateKey: 'ESrGXUAklUux9U-IuHL1QXLiORiiHEOikyi8tFs7GKM'
+}
+
+export { mongoDBConfig, jwt, email, session, googleOAuth, webPushVapid }
