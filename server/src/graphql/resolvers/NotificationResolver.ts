@@ -5,6 +5,7 @@ import NotificationsDAO, { INotification } from '../../dao/NotificationsDAO'
 import UsersDAO from '../../dao/UsersDAO'
 import AnnouncementsDAO from '../../dao/AnnouncementsDAO'
 import webPush from 'web-push'
+import { webPushVapid } from '../../../config/config'
 
 @InputType()
 class PersonInput {
@@ -34,9 +35,9 @@ export class NotificationResolver {
     const results = await Promise.all(
       usersWithSubscriptions.map(async user => {
         webPush.setVapidDetails(
-          'mailto:a@example.com',
-          'BFsdpKVL7oSeZspZ8Aa6pyaW1oQbI11bmd_-bpduPnS9_UT8DRhCp3gdTZ_2e9HpFrTfU-lqZuj98Tvvva2-Zdw',
-          'ESrGXUAklUux9U-IuHL1QXLiORiiHEOikyi8tFs7GKM'
+          webPushVapid.subject,
+          webPushVapid.publicKey,
+          webPushVapid.privateKey
         )
         user.subscriptions.map(sub => {
           console.log('sending notifications', sub)

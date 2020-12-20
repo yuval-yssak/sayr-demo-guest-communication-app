@@ -23,6 +23,7 @@ import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import session from 'express-session'
 import passport from './passport'
+import { session as sessionConfig } from '../config/config'
 
 const app = express()
 
@@ -35,7 +36,7 @@ app.use(cors({ credentials: true, origin: /^http:\/\/localhost:.*$/ }))
 // "finishLoginWithGoogle" in which it gets the access and refresh tokens.
 app.use(
   session({
-    secret: 'b1a8qzzuzpvw8jewx2vysqqh2hq8lcgwqyd92j01ol',
+    secret: sessionConfig.secret,
     name: 'oauth-bridge',
     resave: false,
     saveUninitialized: false,

@@ -5,6 +5,7 @@ import {
   Profile
 } from 'passport-google-oauth20'
 import UsersDAO, { PermissionLevel } from './dao/UsersDAO'
+import { googleOAuthStaffApp, googleOAuthGuestApp } from '../config/config'
 
 async function connectOauthToDB(
   accessToken: string,
@@ -72,10 +73,9 @@ passport.use(
   'guest-app-google',
   new GoogleStrategy(
     {
-      clientID:
-        '1053321495897-vgj5hu2dqo1utpps5mqnrt0tfn160955.apps.googleusercontent.com',
-      clientSecret: '33dKswmH65gXmZCWm10e_r42',
-      callbackURL: 'http://localhost:4000/guest-app/login-with-google/callback'
+      clientID: googleOAuthGuestApp.clientID,
+      clientSecret: googleOAuthGuestApp.clientSecret,
+      callbackURL: googleOAuthGuestApp.callbackURL
     },
     connectOauthToDB
   )
@@ -85,10 +85,9 @@ passport.use(
   'staff-app-google',
   new GoogleStrategy(
     {
-      clientID:
-        '1053321495897-vgj5hu2dqo1utpps5mqnrt0tfn160955.apps.googleusercontent.com',
-      clientSecret: '33dKswmH65gXmZCWm10e_r42',
-      callbackURL: 'http://localhost:4000/staff-app/login-with-google/callback'
+      clientID: googleOAuthStaffApp.clientID,
+      clientSecret: googleOAuthStaffApp.clientSecret,
+      callbackURL: googleOAuthStaffApp.callbackURL
     },
     connectOauthToDB
   )
