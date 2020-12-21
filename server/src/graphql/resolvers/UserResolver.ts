@@ -278,37 +278,63 @@ class UserResolver {
     @Arg('authKey') authKey: string
   ): Promise<NotificationSubscription> {
     const id = new ObjectId()
+    let subscription: IUser['subscriptions'][number] | undefined
+    subscription = (
+      await UsersDAO.findArray({
+        'subscriptions.endpoint': endpoint
+      })
+    )?.[0]?.subscriptions.find(s => (s.endpoint = endpoint))
 
-    await UsersDAO.updateOne(
-      { _id: new ObjectID(userId) },
-      {
-        $push: {
-          subscriptions: {
-            id,
-            userAgent,
-            endpoint,
-            keys: {
-              p256dh: p256dhKey,
-              auth: authKey
+    if (subscription) {
+      await UsersDAO.updateOne(
+        { _id: new ObjectID(userId), 'subscriptions.endpoint': endpoint },
+        {
+          $set: {
+            'subscriptions.$': {
+              id,
+              userAgent,
+              endpoint,
+              keys: {
+                p256dh: p256dhKey,
+                auth: authKey
+              }
             }
           }
         }
-      }
-    )
+      )
+    } else
+      await UsersDAO.updateOne(
+        { _id: new ObjectID(userId) },
+        {
+          $push: {
+            subscriptions: {
+              id,
+              userAgent,
+              endpoint,
+              keys: {
+                p256dh: p256dhKey,
+                auth: authKey
+              }
+            }
+          }
+        }
+      )
 
-    const [user] = await UsersDAO.findArray({ 'subscriptions.id': id })
-    const subscription = user.subscriptions.find(s => s.id.equals(id))
-
-    if (!subscription)
+    const [user] = await UsersDAO.findArray({
+      'subscriptions.endpoint': endpoint
+    })
+    const newSubscription = user?.subscriptions.find(s => s.id.equals(id))
+    if (!newSubscription)
       throw new Error(
         `cannot find the newly inserted subscription with id  ${id.toHexString()}`
       )
+
     return new NotificationSubscription({
-      id: subscription.id,
-      userAgent: subscription.userAgent,
-      authKey: subscription.keys.auth,
-      endpoint: subscription.endpoint,
-      p256dhKey: subscription.keys.p256dh
+      id: newSubscription.id,
+      userAgent: newSubscription.userAgent,
+      authKey: newSubscription.keys.auth,
+      endpoint: newSubscription.endpoint,
+      p256dhKey: newSubscription.keys.p256dh
     })
   }
 
