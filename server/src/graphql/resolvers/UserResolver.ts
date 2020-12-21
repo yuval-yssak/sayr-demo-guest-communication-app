@@ -282,12 +282,12 @@ class UserResolver {
 
     const subscription = (
       await UsersDAO.findArray({
+        _id: new ObjectId(userId),
         'subscriptions.endpoint': endpoint
       })
     )?.[0]?.subscriptions.find(s => (s.endpoint = endpoint))
-    console.log('subscription', subscription)
     if (subscription) {
-      const r = await UsersDAO.updateOne(
+      await UsersDAO.updateOne(
         { _id: new ObjectID(userId), 'subscriptions.endpoint': endpoint },
         {
           $set: {
@@ -302,12 +302,6 @@ class UserResolver {
             }
           }
         }
-      )
-      console.log(
-        r.matchedCount,
-        r.modifiedCount,
-        r.upsertedCount,
-        r.upsertedId
       )
     } else
       await UsersDAO.updateOne(
