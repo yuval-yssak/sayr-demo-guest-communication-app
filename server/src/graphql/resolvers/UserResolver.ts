@@ -136,9 +136,10 @@ class UserResolver {
     @Arg('password') password: string,
     @Ctx() { req }: MyContext
   ) {
-    const app = req.originalUrl.includes(process.env.CLIENT_STAFF_APP_BASE_URL!)
-      ? 'staff-app'
-      : 'guest-app'
+    const app =
+      req.headers.origin === process.env.CLIENT_STAFF_APP_BASE_URL
+        ? 'staff-app'
+        : 'guest-app'
 
     const hashedPassword = await hash(password, 10)
     const user = (await UsersDAO.findArray({ email }))?.[0]
