@@ -96,8 +96,14 @@ export type ActivityInput = {
 /* The TypeScript type that explicits the refs to other models in order to prevent a circular refs issue */
 type Refs = {
   appUsers: ObservableMap<string, AppUserModelType>
+  notificationSubscriptions: ObservableMap<
+    string,
+    NotificationSubscriptionModelType
+  >
   registrationResponses: ObservableMap<string, RegistrationResponseModelType>
+  announcementResponses: ObservableMap<string, AnnouncementResponseModelType>
   activities: ObservableMap<string, ActivityModelType>
+  notificationResponses: ObservableMap<string, NotificationResponseModelType>
   recipients: ObservableMap<string, RecipientModelType>
 }
 
@@ -149,7 +155,15 @@ export const RootStoreBase = withTypedRefs<Refs>()(
           ['Recipient', () => RecipientModel],
           ['Device', () => DeviceModel]
         ],
-        ['AppUser', 'RegistrationResponse', 'Activity', 'Recipient'],
+        [
+          'AppUser',
+          'NotificationSubscription',
+          'RegistrationResponse',
+          'AnnouncementResponse',
+          'Activity',
+          'NotificationResponse',
+          'Recipient'
+        ],
         'js'
       )
     )
@@ -158,12 +172,24 @@ export const RootStoreBase = withTypedRefs<Refs>()(
         types.map(types.late((): any => AppUserModel)),
         {}
       ),
+      notificationSubscriptions: types.optional(
+        types.map(types.late((): any => NotificationSubscriptionModel)),
+        {}
+      ),
       registrationResponses: types.optional(
         types.map(types.late((): any => RegistrationResponseModel)),
         {}
       ),
+      announcementResponses: types.optional(
+        types.map(types.late((): any => AnnouncementResponseModel)),
+        {}
+      ),
       activities: types.optional(
         types.map(types.late((): any => ActivityModel)),
+        {}
+      ),
+      notificationResponses: types.optional(
+        types.map(types.late((): any => NotificationResponseModel)),
         {}
       ),
       recipients: types.optional(
@@ -375,10 +401,25 @@ export const RootStoreBase = withTypedRefs<Refs>()(
           userAgent: string
           userId: string
         },
+        resultSelector:
+          | string
+          | ((
+              qb: NotificationSubscriptionModelSelector
+            ) => NotificationSubscriptionModelSelector) = notificationSubscriptionModelPrimitives.toString(),
         optimisticUpdate?: () => void
       ) {
-        return self.mutate<{ createUserSubscription: boolean }>(
-          `mutation createUserSubscription($authKey: String!, $p256DhKey: String!, $endpoint: String!, $userAgent: String!, $userId: String!) { createUserSubscription(authKey: $authKey, p256dhKey: $p256DhKey, endpoint: $endpoint, userAgent: $userAgent, userId: $userId) }`,
+        return self.mutate<{
+          createUserSubscription: NotificationSubscriptionModelType
+        }>(
+          `mutation createUserSubscription($authKey: String!, $p256DhKey: String!, $endpoint: String!, $userAgent: String!, $userId: String!) { createUserSubscription(authKey: $authKey, p256dhKey: $p256DhKey, endpoint: $endpoint, userAgent: $userAgent, userId: $userId) {
+        ${
+          typeof resultSelector === 'function'
+            ? resultSelector(
+                new NotificationSubscriptionModelSelector()
+              ).toString()
+            : resultSelector
+        }
+      } }`,
           variables,
           optimisticUpdate
         )

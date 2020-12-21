@@ -69,39 +69,43 @@ function Guests() {
                       <br />
                       Registered:{' '}
                       {reg.userData ? (
-                        reg.userData.permissionLevel ===
-                        PermissionLevel.None ? (
-                          <>
+                        <>
+                          {reg.userData.permissionLevel ===
+                          PermissionLevel.None ? (
                             <span>As a guest</span>
-                            <p>Devices: </p>
-                            <TableContainer component={Paper}>
-                              <Table aria-label="simple table">
-                                <TableHead>
-                                  <TableRow>
-                                    <TableCell>Device Type</TableCell>
-                                    <TableCell align="right">Brand</TableCell>
-                                    <TableCell align="right">Model</TableCell>
-                                  </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                  {reg.userData.subscriptions?.map(s => (
-                                    <TableRow key={s.userAgent}>
-                                      <UserDeviceSubscription
-                                        userAgent={s.userAgent}
-                                      />
-                                    </TableRow>
-                                  ))}
-                                </TableBody>
-                              </Table>
-                            </TableContainer>{' '}
-                          </>
-                        ) : (
-                          'As staff'
-                        )
+                          ) : (
+                            <span>As staff</span>
+                          )}
+                        </>
                       ) : (
                         'No'
                       )}
                     </Typography>
+                    {reg.userData && (
+                      <>
+                        <p>Devices: </p>
+                        <TableContainer component={Paper}>
+                          <Table aria-label="simple table">
+                            <TableHead>
+                              <TableRow>
+                                <TableCell>Device Type</TableCell>
+                                <TableCell align="right">Brand</TableCell>
+                                <TableCell align="right">Model</TableCell>
+                              </TableRow>
+                            </TableHead>
+                            <TableBody>
+                              {reg.userData.subscriptions?.map(s => (
+                                <TableRow key={s.id}>
+                                  <UserDeviceSubscription
+                                    userAgent={s.userAgent || ''}
+                                  />
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        </TableContainer>{' '}
+                      </>
+                    )}
                   </CardContent>
                 </CardActionArea>
                 <CardActions>

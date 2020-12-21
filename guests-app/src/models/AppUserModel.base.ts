@@ -2,8 +2,9 @@
 /* eslint-disable */
 /* tslint:disable */
 
+import { IObservableArray } from 'mobx'
 import { types } from 'mobx-state-tree'
-import { QueryBuilder } from 'mst-gql'
+import { MSTGQLRef, QueryBuilder, withTypedRefs } from 'mst-gql'
 import { ModelBase } from './ModelBase'
 import { InvitationModel, InvitationModelType } from './InvitationModel'
 import { InvitationModelSelector } from './InvitationModel.base'
@@ -15,31 +16,40 @@ import { NotificationSubscriptionModelSelector } from './NotificationSubscriptio
 import { PermissionLevelEnumType } from './PermissionLevelEnum'
 import { RootStoreType } from './index'
 
+/* The TypeScript type that explicits the refs to other models in order to prevent a circular refs issue */
+type Refs = {
+  subscriptions: IObservableArray<NotificationSubscriptionModelType>
+}
+
 /**
  * AppUserBase
  * auto generated base class for the model AppUserModel.
  */
-export const AppUserModelBase = ModelBase.named('AppUser')
-  .props({
-    __typename: types.optional(types.literal('AppUser'), 'AppUser'),
-    id: types.identifier,
-    email: types.union(types.undefined, types.string),
-    permissionLevel: types.union(types.undefined, PermissionLevelEnumType),
-    invitationsSent: types.union(
-      types.undefined,
-      types.array(types.late((): any => InvitationModel))
-    ),
-    subscriptions: types.union(
-      types.undefined,
-      types.array(types.late((): any => NotificationSubscriptionModel))
-    ),
-    profilePhoto: types.union(types.undefined, types.null, types.string)
-  })
-  .views(self => ({
-    get store() {
-      return self.__getStore<RootStoreType>()
-    }
-  }))
+export const AppUserModelBase = withTypedRefs<Refs>()(
+  ModelBase.named('AppUser')
+    .props({
+      __typename: types.optional(types.literal('AppUser'), 'AppUser'),
+      id: types.identifier,
+      email: types.union(types.undefined, types.string),
+      permissionLevel: types.union(types.undefined, PermissionLevelEnumType),
+      invitationsSent: types.union(
+        types.undefined,
+        types.array(types.late((): any => InvitationModel))
+      ),
+      subscriptions: types.union(
+        types.undefined,
+        types.array(
+          MSTGQLRef(types.late((): any => NotificationSubscriptionModel))
+        )
+      ),
+      profilePhoto: types.union(types.undefined, types.null, types.string)
+    })
+    .views(self => ({
+      get store() {
+        return self.__getStore<RootStoreType>()
+      }
+    }))
+)
 
 export class AppUserModelSelector extends QueryBuilder {
   get id() {

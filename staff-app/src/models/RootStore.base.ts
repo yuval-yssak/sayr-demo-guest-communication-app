@@ -96,6 +96,10 @@ export type ActivityInput = {
 /* The TypeScript type that explicits the refs to other models in order to prevent a circular refs issue */
 type Refs = {
   appUsers: ObservableMap<string, AppUserModelType>
+  notificationSubscriptions: ObservableMap<
+    string,
+    NotificationSubscriptionModelType
+  >
   registrationResponses: ObservableMap<string, RegistrationResponseModelType>
   announcementResponses: ObservableMap<string, AnnouncementResponseModelType>
   activities: ObservableMap<string, ActivityModelType>
@@ -153,6 +157,7 @@ export const RootStoreBase = withTypedRefs<Refs>()(
         ],
         [
           'AppUser',
+          'NotificationSubscription',
           'RegistrationResponse',
           'AnnouncementResponse',
           'Activity',
@@ -165,6 +170,10 @@ export const RootStoreBase = withTypedRefs<Refs>()(
     .props({
       appUsers: types.optional(
         types.map(types.late((): any => AppUserModel)),
+        {}
+      ),
+      notificationSubscriptions: types.optional(
+        types.map(types.late((): any => NotificationSubscriptionModel)),
         {}
       ),
       registrationResponses: types.optional(
@@ -392,10 +401,25 @@ export const RootStoreBase = withTypedRefs<Refs>()(
           userAgent: string
           userId: string
         },
+        resultSelector:
+          | string
+          | ((
+              qb: NotificationSubscriptionModelSelector
+            ) => NotificationSubscriptionModelSelector) = notificationSubscriptionModelPrimitives.toString(),
         optimisticUpdate?: () => void
       ) {
-        return self.mutate<{ createUserSubscription: boolean }>(
-          `mutation createUserSubscription($authKey: String!, $p256DhKey: String!, $endpoint: String!, $userAgent: String!, $userId: String!) { createUserSubscription(authKey: $authKey, p256dhKey: $p256DhKey, endpoint: $endpoint, userAgent: $userAgent, userId: $userId) }`,
+        return self.mutate<{
+          createUserSubscription: NotificationSubscriptionModelType
+        }>(
+          `mutation createUserSubscription($authKey: String!, $p256DhKey: String!, $endpoint: String!, $userAgent: String!, $userId: String!) { createUserSubscription(authKey: $authKey, p256dhKey: $p256DhKey, endpoint: $endpoint, userAgent: $userAgent, userId: $userId) {
+        ${
+          typeof resultSelector === 'function'
+            ? resultSelector(
+                new NotificationSubscriptionModelSelector()
+              ).toString()
+            : resultSelector
+        }
+      } }`,
           variables,
           optimisticUpdate
         )

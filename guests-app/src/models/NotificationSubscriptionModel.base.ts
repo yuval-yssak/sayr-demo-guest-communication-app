@@ -19,6 +19,7 @@ export const NotificationSubscriptionModelBase = ModelBase.named(
       types.literal('NotificationSubscription'),
       'NotificationSubscription'
     ),
+    id: types.identifier,
     userAgent: types.union(types.undefined, types.string)
   })
   .views(self => ({
@@ -28,6 +29,9 @@ export const NotificationSubscriptionModelBase = ModelBase.named(
   }))
 
 export class NotificationSubscriptionModelSelector extends QueryBuilder {
+  get id() {
+    return this.__attr(`id`)
+  }
   get userAgent() {
     return this.__attr(`userAgent`)
   }
