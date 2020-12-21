@@ -41,7 +41,7 @@ function createAccessToken(user: IUser): string {
     email: user.email,
     tokenVersion: user.login.tokenVersion
   }
-  return sign(payload, jwt.secretKeyForAccess, { expiresIn: '15s' })
+  return sign(payload, jwt.secretKeyForAccess, { expiresIn: '15m' })
 }
 
 function createRefreshToken(user: IUser): string {
