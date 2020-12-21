@@ -7,12 +7,12 @@
  * 2. cors         - allow the client URL only as origin
  *
  * 3. session      - during an OAuth authentication, store the oauth profile
- *                   on the server in-memory for 5 seconds only to allow the
+ *                   on the server session for 25 seconds only to allow the
  *                   client to securely request the tokens upon successfully
  *                   finishing the Oauth login process.
  *                   This session is put in use when the server redirects the
  *                   client back to the client app url, the session remains
- *                   valid for 5 seconds, allowing the user to fetch the tokens
+ *                   valid for 25 seconds, allowing the user to fetch the tokens
  *                   from the server url.
  *
  * 4. passport     - OAuth setup
@@ -77,7 +77,7 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      maxAge: 1000 * 5, // 5 seconds only. Cookie should die after client first redirect
+      maxAge: 1000 * 25, // 25 seconds only. Cookie should die after client first redirect
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'none'
     }

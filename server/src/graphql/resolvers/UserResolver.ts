@@ -132,8 +132,13 @@ class UserResolver {
   @Mutation(() => Boolean)
   async register(
     @Arg('email') email: string,
-    @Arg('password') password: string
+    @Arg('password') password: string,
+    @Ctx() { req }: MyContext
   ) {
+    const app = req.originalUrl.includes(process.env.CLIENT_STAFF_APP_BASE_URL!)
+      ? 'staff-app'
+      : 'guest-app'
+
     const hashedPassword = await hash(password, 10)
     const user = (await UsersDAO.findArray({ email }))?.[0]
 
@@ -159,7 +164,7 @@ class UserResolver {
             }
           }
         )
-        requestEmailVerification(email, requestID)
+        requestEmailVerification(email, requestID, app)
 
         return true
       } else if (!user) {
@@ -186,7 +191,7 @@ class UserResolver {
           subscriptions: []
         })
 
-        await requestEmailVerification(email, requestID)
+        await requestEmailVerification(email, requestID, app)
         return true
       }
       // In case the user exists already with a password, ignore.

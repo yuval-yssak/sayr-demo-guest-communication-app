@@ -28,7 +28,7 @@ const authRoutes = (app: Express) => {
     } as AuthenticateOptionsGoogle)
   )
 
-  // store server-side cookie session for 5 seconds and
+  // store server-side cookie session for 25 seconds and
   // redirect the client back to the client app.
   app.get(
     '/guest-app/login-with-google/callback',
@@ -41,7 +41,7 @@ const authRoutes = (app: Express) => {
     }
   )
 
-  // store server-side cookie session for 5 seconds and
+  // store server-side cookie session for 25 seconds and
   // redirect the client back to the client app.
   app.get(
     '/staff-app/login-with-google/callback',
@@ -56,7 +56,7 @@ const authRoutes = (app: Express) => {
   )
 
   app.get(
-    '/verify-email/:id',
+    '/:app/verify-email/:id',
     async (req, res): Promise<void> => {
       const requestID = req.params.id
       console.log({
@@ -89,7 +89,11 @@ const authRoutes = (app: Express) => {
         return
       }
       res.send(
-        '<p>Great, you are verified.</p><a href="http://localhost:3000">Click here to head on to the app.</a>'
+        `<p>Great, you are verified.</p><a href="${
+          req.params.app === 'staff-app'
+            ? process.env.CLIENT_STAFF_APP_BASE_URL
+            : process.env.CLIENT_GUEST_APP_BASE_URL
+        }">Click here to head on to the app.</a>`
       )
       // todo: redirect to automatically log the user in.
       return
