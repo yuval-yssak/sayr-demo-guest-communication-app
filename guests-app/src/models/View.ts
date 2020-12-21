@@ -10,6 +10,7 @@ const viewModel = types
       types.literal(''),
       types.literal('/'),
       types.literal('/login'),
+      types.literal('/announcements'),
       types.literal('/register'),
       types.literal('/custom')
     ),
@@ -42,6 +43,7 @@ const viewModel = types
     },
     openLoginPage: () => (self.page = '/login'),
     openRegisterPage: () => (self.page = '/register'),
+    openAnnouncementsPage: () => (self.page = '/announcements'),
     setFromURL() {
       const newView = getViewFromURL() as Instance<typeof viewModel>
       console.log('setting from url', window.location.pathname, newView.page)
@@ -74,6 +76,7 @@ function getViewFromURL() {
         return { page: '/' }
       case '/login':
       case '/register':
+      case '/announcements':
         return { page: matchedGeneral.path }
       default:
         return { page: '/' }

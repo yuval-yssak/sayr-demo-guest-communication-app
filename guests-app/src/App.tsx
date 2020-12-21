@@ -6,6 +6,7 @@ import Register from './pages/Register'
 import Login from './pages/Login'
 import Header from './components/Header'
 import { IView } from './models/View'
+import Announcements from './pages/Announcements'
 
 function renderPage(view: IView) {
   switch (view.page) {
@@ -15,6 +16,8 @@ function renderPage(view: IView) {
       return <Register />
     case '/login':
       return <Login />
+    case '/announcements':
+      return <Announcements />
     default:
       return 'Sorry, not found'
   }

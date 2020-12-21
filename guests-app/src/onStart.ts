@@ -68,4 +68,6 @@ export default function onStart(
       }
     }
   })
+
+  rootStore.queryGetAllValidAnnouncements()
 }

@@ -19,6 +19,13 @@ const Header: React.FC<Props> = () => {
             Register
           </button>
         )}
+        {store.loggedInUser && (
+          <>
+            <button onClick={() => store.view.openAnnouncementsPage()}>
+              Announcements
+            </button>
+          </>
+        )}
       </header>
       <div>
         {store.loggedInUser ? (
