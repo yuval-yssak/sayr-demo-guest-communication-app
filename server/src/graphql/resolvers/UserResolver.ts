@@ -8,7 +8,8 @@ import {
   registerEnumType,
   InputType,
   Field,
-  ObjectType
+  ObjectType,
+  ID
 } from 'type-graphql'
 import { compare, hash } from 'bcryptjs'
 import { ObjectID, ObjectId } from 'mongodb'
@@ -45,22 +46,26 @@ class Invitation {
 
 @ObjectType()
 export class NotificationSubscription {
+  @Field(_type => ID) id: ObjectId
   @Field() userAgent: string
   endpoint: string
   p256dhKey: string
   authKey: string
 
   constructor({
+    id,
     userAgent,
     endpoint,
     p256dhKey,
     authKey
   }: {
+    id: ObjectId
     userAgent: string
     endpoint: string
     p256dhKey: string
     authKey: string
   }) {
+    this.id = id
     this.userAgent = userAgent
     this.endpoint = endpoint
     this.p256dhKey = p256dhKey
@@ -85,6 +90,7 @@ export class AppUser extends User {
     this.subscriptions = user.subscriptions.map(
       s =>
         new NotificationSubscription({
+          id: s.id,
           userAgent: s.userAgent,
           endpoint: s.endpoint,
           p256dhKey: s.keys.p256dh,
@@ -263,19 +269,22 @@ class UserResolver {
     return result.result.ok === 1
   }
 
-  @Mutation(() => Boolean)
+  @Mutation(() => NotificationSubscription)
   async createUserSubscription(
     @Arg('userId') userId: string,
     @Arg('userAgent') userAgent: string,
     @Arg('endpoint') endpoint: string,
     @Arg('p256dhKey') p256dhKey: string,
     @Arg('authKey') authKey: string
-  ): Promise<boolean> {
-    const result = await UsersDAO.updateOne(
+  ): Promise<NotificationSubscription> {
+    const id = new ObjectId()
+
+    await UsersDAO.updateOne(
       { _id: new ObjectID(userId) },
       {
         $push: {
           subscriptions: {
+            id,
             userAgent,
             endpoint,
             keys: {
@@ -286,7 +295,21 @@ class UserResolver {
         }
       }
     )
-    return result.result.ok === 1
+
+    const [user] = await UsersDAO.findArray({ 'subscriptions.id': id })
+    const subscription = user.subscriptions.find(s => s.id.equals(id))
+
+    if (!subscription)
+      throw new Error(
+        `cannot find the newly inserted subscription with id  ${id.toHexString()}`
+      )
+    return new NotificationSubscription({
+      id: subscription.id,
+      userAgent: subscription.userAgent,
+      authKey: subscription.keys.auth,
+      endpoint: subscription.endpoint,
+      p256dhKey: subscription.keys.p256dh
+    })
   }
 
   @Mutation(() => Boolean)

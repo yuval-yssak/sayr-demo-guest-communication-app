@@ -37,6 +37,7 @@ export type IUser = WithId<{
   }
   invitationsSent: { timestamp: Date; staff: ObjectId }[]
   subscriptions: {
+    id: ObjectId
     userAgent: string
     endpoint: string
     keys: {
