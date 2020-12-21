@@ -17,7 +17,6 @@ function Header() {
             Register
           </button>
         )}
-        <button onClick={() => store.view.openSecretPage()}>Secret</button>
         {store.loggedInUser && (
           <>
             <button onClick={() => store.view.openGuestsPage()}>Guests</button>

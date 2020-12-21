@@ -11,7 +11,6 @@ const viewModel = types
       types.literal('/'),
       types.literal('/login'),
       types.literal('/register'),
-      types.literal('/secret'),
       types.literal('/guests'),
       types.literal('/announcements'),
       types.literal('/custom')
@@ -45,7 +44,6 @@ const viewModel = types
     },
     openLoginPage: () => (self.page = '/login'),
     openRegisterPage: () => (self.page = '/register'),
-    openSecretPage: () => (self.page = '/secret'),
     openGuestsPage: () => (self.page = '/guests'),
     openAnnouncementsPage: () => (self.page = '/announcements'),
     setFromURL() {
