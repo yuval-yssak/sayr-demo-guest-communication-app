@@ -278,15 +278,16 @@ class UserResolver {
     @Arg('authKey') authKey: string
   ): Promise<NotificationSubscription> {
     const id = new ObjectId()
+    console.log('createing user subscription', endpoint, userAgent)
 
     const subscription = (
       await UsersDAO.findArray({
         'subscriptions.endpoint': endpoint
       })
     )?.[0]?.subscriptions.find(s => (s.endpoint = endpoint))
-
+    console.log('subscription', subscription)
     if (subscription) {
-      await UsersDAO.updateOne(
+      const r = await UsersDAO.updateOne(
         { _id: new ObjectID(userId), 'subscriptions.endpoint': endpoint },
         {
           $set: {
@@ -301,6 +302,12 @@ class UserResolver {
             }
           }
         }
+      )
+      console.log(
+        r.matchedCount,
+        r.modifiedCount,
+        r.upsertedCount,
+        r.upsertedId
       )
     } else
       await UsersDAO.updateOne(
