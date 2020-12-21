@@ -36,7 +36,7 @@ const googleOAuthStaffApp = {
 const webPushVapid = {
   subject: process.env.WEB_PUSH_VAPID_SUBJECT!,
   publicKey: process.env.WEB_PUSH_VAPID_PUBLIC_KEY!,
-  privateKey: process.env.WEB_PUSH_VAPID_PUBLIC_KEY!
+  privateKey: process.env.WEB_PUSH_VAPID_PRIVATE_KEY!
 }
 
 export {
