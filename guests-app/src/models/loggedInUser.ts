@@ -1,4 +1,4 @@
-import { types, flow, getRoot } from 'mobx-state-tree'
+import { types } from 'mobx-state-tree'
 import jwtDecode from 'jwt-decode'
 import { now } from 'mobx-utils'
 
@@ -47,20 +47,6 @@ const loggedInUser = types.maybeNull(
         console.log('setting new access token')
         self.accessToken = newToken
       }
-    }))
-    .actions(self => ({
-      refreshToken: flow(function* refreshToken() {
-        const response: Response = yield fetch(
-          `${process.env.REACT_APP_SERVER_BASE_URL}/refresh-token`,
-          {
-            method: 'POST',
-            credentials: 'include'
-          }
-        )
-        const json: { accessToken: string; ok: boolean } = yield response.json()
-        if (json.ok) self.setAccessToken(json.accessToken)
-        else (getRoot(self) as any).logout()
-      })
     }))
 )
 

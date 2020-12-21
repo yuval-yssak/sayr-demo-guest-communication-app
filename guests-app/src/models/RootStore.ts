@@ -65,5 +65,22 @@ export const RootStore = RootStoreBase.props({
       self.loggedInUser && destroy(self.loggedInUser)
     }
   }))
+  .actions(self => ({
+    refreshAccessToken: flow(function* refreshToken() {
+      const response: Response = yield fetch(
+        `${process.env.REACT_APP_SERVER_BASE_URL}/refresh-token`,
+        {
+          method: 'POST',
+          credentials: 'include'
+        }
+      )
+      const json: { accessToken: string; ok: boolean } = yield response.json()
+      if (json.ok) {
+        self.loggedInUser = loggedInUser.create({
+          accessToken: json.accessToken
+        })
+      } else self.logout()
+    })
+  }))
 
   .extend(localStorageMixin({ filter: ['loggedInUser'], throttle: 2000 }))

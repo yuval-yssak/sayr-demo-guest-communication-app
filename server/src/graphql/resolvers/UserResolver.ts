@@ -22,7 +22,8 @@ import {
   installRefreshTokenCookie,
   removeRefreshTokenCookie,
   authenticateClient,
-  MyContext
+  MyContext,
+  createTokensAfterPasswordVerified
 } from '../../auth/auth'
 import requestEmailVerification from '../../emailVerification'
 import LoginResponse from '../schema/LoginResponse'
@@ -212,7 +213,7 @@ class UserResolver {
     @Ctx() { res }: MyContext
   ): Promise<LoginResponse> {
     // find user record by email
-    const user = (await UsersDAO.findArray({ email }))?.[0]
+    const [user] = await UsersDAO.findArray({ email })
 
     if (!user) throw new Error('could not find user ' + email)
 
@@ -224,11 +225,7 @@ class UserResolver {
 
     if (!valid) throw new Error('wrong password')
 
-    const accessToken = createAccessToken(user)
-    const refreshToken = createRefreshToken(user)
-
-    installRefreshTokenCookie(refreshToken, res)
-    return { accessToken }
+    return createTokensAfterPasswordVerified(user, res)
   }
 
   @Mutation(() => Boolean)

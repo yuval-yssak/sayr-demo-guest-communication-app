@@ -2,7 +2,7 @@ import { Request, Response, Express } from 'express'
 import { ObjectId } from 'mongodb'
 import passport from 'passport'
 import { AuthenticateOptionsGoogle } from 'passport-google-oauth20'
-import { exchangeToken } from '../auth/auth'
+import { createTokensAfterPasswordVerified, exchangeToken } from '../auth/auth'
 import UsersDAO from '../dao/UsersDAO'
 
 const authRoutes = (app: Express) => {
@@ -88,15 +88,20 @@ const authRoutes = (app: Express) => {
           .send('Did not find a user with your email from the last 48 hours')
         return
       }
-      res.send(
-        `<p>Great, you are verified.</p><a href="${
+
+      const [updatedUser] = await UsersDAO.findArray({
+        _id: new ObjectId(user._id)
+      })
+
+      createTokensAfterPasswordVerified(updatedUser, res)
+
+      res.redirect(
+        `${
           req.params.app === 'staff-app'
             ? process.env.CLIENT_STAFF_APP_BASE_URL
             : process.env.CLIENT_GUEST_APP_BASE_URL
-        }">Click here to head on to the app.</a>`
+        }/login-verified`
       )
-      // todo: redirect to automatically log the user in.
-      return
     }
   )
 }

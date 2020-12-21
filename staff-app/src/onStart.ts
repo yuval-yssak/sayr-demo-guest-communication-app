@@ -11,7 +11,10 @@ export default function onStart(
   if (window.location.pathname === '/after-google-login')
     rootStore.finishGoogleLogin()
 
-  // whenever the view changes - push to browser history
+  if (window.location.pathname === '/login-verified')
+    rootStore.refreshAccessToken()
+
+    // whenever the view changes - push to browser history
   reaction(
     () => rootStore.view.currentURL,
     path => {
@@ -46,7 +49,7 @@ export default function onStart(
       !rootStore.loggedInUser?.isTokenValidWithMargin(5000) &&
       rootStore.loggedInUser?.isOnline
     )
-      rootStore.loggedInUser?.refreshToken()
+      rootStore.refreshAccessToken()
   })
 
   // synchronize login and logout on all tabs

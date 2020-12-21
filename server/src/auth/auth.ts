@@ -60,7 +60,7 @@ function installRefreshTokenCookie(refreshToken: string, res: Response) {
     path: '/refresh-token',
     secure: process.env.NODE_ENV === 'production',
     maxAge: 1000 * 60 * 60 * 24 * 7,
-    sameSite: 'none'
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
   })
 }
 
@@ -123,6 +123,14 @@ const authenticateClient: MiddlewareFn<MyContext> = ({ context }, next) => {
   return next()
 }
 
+function createTokensAfterPasswordVerified(user: IUser, res: Response) {
+  const accessToken = createAccessToken(user)
+  const refreshToken = createRefreshToken(user)
+
+  installRefreshTokenCookie(refreshToken, res)
+  return { accessToken }
+}
+
 export {
   User,
   createAccessToken,
@@ -131,5 +139,6 @@ export {
   removeRefreshTokenCookie,
   AccessTokenPayload,
   exchangeToken,
-  authenticateClient
+  authenticateClient,
+  createTokensAfterPasswordVerified
 }
