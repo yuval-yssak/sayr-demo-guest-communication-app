@@ -74,6 +74,7 @@ function getViewFromURL() {
         return { page: '/' }
       case '/login':
       case '/register':
+        return { page: matchedGeneral.path }
       default:
         return { page: '/' }
     }
