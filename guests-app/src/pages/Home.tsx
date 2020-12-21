@@ -8,10 +8,17 @@ function Home() {
   return (
     <>
       <p>Home</p>
-      {store.loggedInUser && (
+      {store.loggedInUser && navigator.serviceWorker && (
         <button onClick={() => askForNotificationPermission(store)}>
           Register for Notifications
         </button>
+      )}
+
+      {!navigator.serviceWorker && (
+        <p>
+          Unfortunately, there is no service worker available for you at this
+          configuration
+        </p>
       )}
     </>
   )

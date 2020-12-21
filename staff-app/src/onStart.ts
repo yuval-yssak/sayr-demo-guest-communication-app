@@ -14,7 +14,7 @@ export default function onStart(
   if (window.location.pathname === '/login-verified')
     rootStore.refreshAccessToken()
 
-    // whenever the view changes - push to browser history
+  // whenever the view changes - push to browser history
   reaction(
     () => rootStore.view.currentURL,
     path => {
