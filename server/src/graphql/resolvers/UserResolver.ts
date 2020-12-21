@@ -278,8 +278,8 @@ class UserResolver {
     @Arg('authKey') authKey: string
   ): Promise<NotificationSubscription> {
     const id = new ObjectId()
-    let subscription: IUser['subscriptions'][number] | undefined
-    subscription = (
+
+    const subscription = (
       await UsersDAO.findArray({
         'subscriptions.endpoint': endpoint
       })
@@ -323,10 +323,12 @@ class UserResolver {
     const [user] = await UsersDAO.findArray({
       'subscriptions.endpoint': endpoint
     })
-    const newSubscription = user?.subscriptions.find(s => s.id.equals(id))
+    const newSubscription = user?.subscriptions.find(
+      s => s.endpoint === endpoint
+    )
     if (!newSubscription)
       throw new Error(
-        `cannot find the newly inserted subscription with id  ${id.toHexString()}`
+        `cannot find the newly inserted subscription with endpoint ${endpoint}`
       )
 
     return new NotificationSubscription({
