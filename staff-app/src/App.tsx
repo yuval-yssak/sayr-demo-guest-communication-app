@@ -8,6 +8,8 @@ import Header from './components/Header'
 import Guests from './pages/Guests'
 import { IView } from './models/View'
 import Announcements from './pages/Announcements'
+import Activities from './pages/Activities'
+import Activitiy from './pages/Activitiy'
 
 function renderPage(view: IView) {
   switch (view.page) {
@@ -21,6 +23,10 @@ function renderPage(view: IView) {
       return <Guests />
     case '/announcements':
       return <Announcements />
+    case '/activities':
+      return <Activities />
+    case '/activityDay':
+      return <Activities />
     default:
       return 'Sorry, not found'
   }
