@@ -145,9 +145,13 @@ class UserResolver {
 
     const requestID = new ObjectId()
     try {
-      if (user && !user.login.password) {
+      if (
+        user &&
+        (!user.login?.password || !user.login.emailVerification?.verified)
+      ) {
         // if the user registered with this email through OAuth,
         // the password is null. Set the new password.
+        // or maybe the user registered and did not complete the verification.
         await UsersDAO.updateOne(
           { _id: user._id },
           {
