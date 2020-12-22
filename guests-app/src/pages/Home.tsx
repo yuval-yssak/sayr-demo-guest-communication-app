@@ -10,7 +10,7 @@ function Home() {
       <p>Home</p>
       {store.loggedInUser && navigator.serviceWorker && (
         <button onClick={() => askForNotificationPermission(store)}>
-          Register for Notifications
+          Register for Notifications...
         </button>
       )}
 
