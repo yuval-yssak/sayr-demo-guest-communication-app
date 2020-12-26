@@ -72,7 +72,7 @@ function removeRefreshTokenCookie(res: Response) {
     path: '/refresh-token',
     secure: process.env.NODE_ENV === 'production',
     maxAge: 1000 * 60 * 60 * 24 * 7,
-    sameSite: 'none'
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
   })
 }
 

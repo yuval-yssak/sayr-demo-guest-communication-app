@@ -79,7 +79,7 @@ app.use(
     cookie: {
       maxAge: 1000 * 25, // 25 seconds only. Cookie should die after client first redirect
       secure: process.env.NODE_ENV === 'production',
-      sameSite: 'none'
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
     }
   })
 )
