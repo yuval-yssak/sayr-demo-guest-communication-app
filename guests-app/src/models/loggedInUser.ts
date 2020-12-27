@@ -1,4 +1,4 @@
-import { Instance, types } from 'mobx-state-tree'
+import { types } from 'mobx-state-tree'
 import jwtDecode from 'jwt-decode'
 import { now } from 'mobx-utils'
 

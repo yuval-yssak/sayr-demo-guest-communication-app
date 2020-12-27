@@ -3,6 +3,9 @@ import { useQuery, StoreContext } from '../models'
 import Error from '../components/Error'
 import { observer } from 'mobx-react-lite'
 import GoogleLogin from '../components/GoogleLogin'
+import SignInSide from './SignInSide'
+import Container from '@material-ui/core/Container'
+import Grid from '@material-ui/core/Grid'
 
 function Login() {
   const [email, setEmail] = useState('')
@@ -23,6 +26,11 @@ function Login() {
   else
     return (
       <>
+        <Grid>
+          <GoogleLogin onClick={() => store.loginWithGoogle()} />
+          <div style={{ marginTop: '1em', marginBottom: '1em' }}> - or -</div>
+        </Grid>
+        <SignInSide />
         <form
           onSubmit={e => {
             e.preventDefault()
@@ -50,7 +58,6 @@ function Login() {
           {error && <Error error={error} />}
           {data && 'Logged in... ' + JSON.stringify(data)}
         </form>
-        <GoogleLogin onClick={() => store.loginWithGoogle()} />
       </>
     )
 }
