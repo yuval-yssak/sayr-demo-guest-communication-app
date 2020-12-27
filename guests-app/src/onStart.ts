@@ -1,7 +1,8 @@
 import { RootStoreType } from './models'
 import { reaction, autorun } from 'mobx'
 import { GraphQLClient } from 'graphql-request'
-
+import { ViewSnapshotType } from './models/View'
+import { applySnapshot, getSnapshot } from 'mobx-state-tree'
 export default function onStart(
   rootStore: RootStoreType,
   gqlHttpClient: GraphQLClient
@@ -50,6 +51,17 @@ export default function onStart(
       rootStore.loggedInUser?.isOnline
     )
       rootStore.refreshAccessToken()
+  })
+
+  let prevViewSnapshot: ViewSnapshotType | null
+  autorun(() => {
+    if (!rootStore.loggedInUser && rootStore.view.page !== '/login') {
+      prevViewSnapshot = getSnapshot(rootStore.view)
+      rootStore.view.openLoginPage()
+    } else if (rootStore.loggedInUser && prevViewSnapshot) {
+      applySnapshot(rootStore.view, prevViewSnapshot)
+      prevViewSnapshot = null
+    }
   })
 
   // synchronize login and logout on all tabs

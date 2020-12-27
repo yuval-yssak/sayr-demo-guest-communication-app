@@ -1,7 +1,7 @@
 import { Instance, destroy, flow } from 'mobx-state-tree'
 import { RootStoreBase } from './RootStore.base'
 import { View } from './View'
-import loggedInUser from './loggedInUser'
+import { LoggedInUser } from './loggedInUser'
 import { localStorageMixin } from 'mst-gql'
 import { LoginResponseModelType } from '.'
 
@@ -9,7 +9,7 @@ export interface RootStoreType extends Instance<typeof RootStore.Type> {}
 
 export const RootStore = RootStoreBase.props({
   view: View,
-  loggedInUser
+  loggedInUser: LoggedInUser
 })
   .actions(self => ({
     // This is an auto-generated example action.
@@ -19,21 +19,19 @@ export const RootStore = RootStoreBase.props({
 
     setLoggedInUser(input: Instance<typeof self.loggedInUser>) {
       self.loggedInUser = input
-        ? loggedInUser.create({ accessToken: input.accessToken })
+        ? LoggedInUser.create({ accessToken: input.accessToken })
         : null
     },
 
     login({ email, password }: { email: string; password: string }) {
       const query = self.mutateLogin({ email, password })
-      query
-        .then(
-          data =>
-            (self.loggedInUser = loggedInUser.create({
-              accessToken: data.login.accessToken!
-            })),
-          error => console.error(error)
-        )
-        .then(() => self.view.openHomePage())
+      query.then(
+        data =>
+          (self.loggedInUser = LoggedInUser.create({
+            accessToken: data.login.accessToken!
+          })),
+        error => console.error(error)
+      )
       return query
     },
 
@@ -49,7 +47,7 @@ export const RootStore = RootStoreBase.props({
           finishLoginWithGoogle: LoginResponseModelType
         } = yield self.mutateFinishLoginWithGoogle({}).promise
 
-        self.loggedInUser = loggedInUser.create({
+        self.loggedInUser = LoggedInUser.create({
           accessToken: query.finishLoginWithGoogle.accessToken!
         })
       } catch (e) {
@@ -76,7 +74,7 @@ export const RootStore = RootStoreBase.props({
       )
       const json: { accessToken: string; ok: boolean } = yield response.json()
       if (json.ok) {
-        self.loggedInUser = loggedInUser.create({
+        self.loggedInUser = LoggedInUser.create({
           accessToken: json.accessToken
         })
       } else self.logout()

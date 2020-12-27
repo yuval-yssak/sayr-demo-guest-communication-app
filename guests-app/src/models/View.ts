@@ -1,7 +1,8 @@
-import { Instance, types } from 'mobx-state-tree'
+import { Instance, SnapshotIn, types } from 'mobx-state-tree'
 import { match, compile } from 'path-to-regexp'
 
 export interface IView extends Instance<typeof View> {}
+export type ViewSnapshotType = SnapshotIn<typeof View>
 
 type IPageWithId = { id: string }
 const viewModel = types

@@ -1,8 +1,8 @@
-import { types } from 'mobx-state-tree'
+import { Instance, types } from 'mobx-state-tree'
 import jwtDecode from 'jwt-decode'
 import { now } from 'mobx-utils'
 
-const loggedInUser = types.maybeNull(
+export const LoggedInUser = types.maybeNull(
   types
     .model('loggedInUser', {
       accessToken: types.string,
@@ -49,5 +49,3 @@ const loggedInUser = types.maybeNull(
       }
     }))
 )
-
-export default loggedInUser
