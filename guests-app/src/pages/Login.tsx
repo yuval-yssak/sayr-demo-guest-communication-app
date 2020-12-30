@@ -12,6 +12,7 @@ import Box from '@material-ui/core/Box'
 import styled from 'styled-components'
 
 const PaddedPaper = styled(Paper)`
+  opacity: 0.95;
   padding: 20px;
 `
 

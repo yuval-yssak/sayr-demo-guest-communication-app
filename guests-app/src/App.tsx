@@ -13,6 +13,8 @@ const StyledRoot = styled.div`
   text-align: center;
   background-image: url('./media/Yoga-Class-Beach-Platform-Sivananda-Bahamas.jpg');
   background-repeat: no-repeat;
+  background-size: cover;
+  background-position: right;
   height: 100vh;
   padding-top: 10px;
 `
