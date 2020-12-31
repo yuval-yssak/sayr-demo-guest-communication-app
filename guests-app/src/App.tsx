@@ -15,6 +15,7 @@ const StyledRoot = styled.div`
   background-repeat: no-repeat;
   background-size: cover;
   background-position: right;
+  overflow-y: auto;
   height: 100vh;
   padding-top: 10px;
 `

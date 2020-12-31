@@ -86,13 +86,8 @@ function ManualSignIn() {
 function Login() {
   return (
     <>
-      <Box
-        height="100vh"
-        justifyContent="center"
-        display="flex"
-        alignItems="center"
-      >
-        <Grid container justify="center">
+      <Box height="100vh" justifyContent="center" display="flex">
+        <Grid container justify="center" style={{ margin: 'auto 0' }}>
           <Grid item xs={12} sm={8} md={6} lg={4} xl={3}>
             <PaddedPaper>
               <Typography variant="body1" paragraph>
@@ -101,6 +96,12 @@ function Login() {
               <GoogleLogin onClick={() => {}} />
               <div style={{ marginTop: '8px', marginBottom: '8px' }}>or</div>
               <ManualSignIn />
+              <Typography variant="caption">
+                By joining, you agree to our{' '}
+                <Link href="https://sivanandabahamas.org/terms-conditions/">
+                  Terms and Privacy Policy
+                </Link>
+              </Typography>
             </PaddedPaper>
           </Grid>
         </Grid>
