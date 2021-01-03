@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import Button from '@material-ui/core/Button'
 import TextField from '@material-ui/core/TextField'
-import { useForm, Ref } from 'react-hook-form'
+import { useForm } from 'react-hook-form'
 import * as EmailValidator from 'email-validator'
 import { PasswordMeter } from 'password-meter'
 import Grid from '@material-ui/core/Grid'
@@ -60,7 +60,7 @@ function isPasswordStrong(password: string) {
   return new PasswordMeter().getResult(password).percent > 80
 }
 
-const StyledInvalidEmailWarning = styled(Typography)`
+const InputValidationWarning = styled(Typography)`
   position: absolute;
   bottom: -12px;
   left: 2px;
@@ -70,17 +70,17 @@ const StyledInvalidEmailWarning = styled(Typography)`
 
 function InvalidEmailWarning() {
   return (
-    <StyledInvalidEmailWarning variant="body2">
+    <InputValidationWarning variant="body2">
       Email is not valid
-    </StyledInvalidEmailWarning>
+    </InputValidationWarning>
   )
 }
 
 function PasswordsMismatchWarning() {
   return (
-    <StyledInvalidEmailWarning variant="body2">
+    <InputValidationWarning variant="body2">
       The passwords do not match
-    </StyledInvalidEmailWarning>
+    </InputValidationWarning>
   )
 }
 
@@ -88,27 +88,35 @@ const StyledEmailTextField = styled(TextField)`
   width: calc(100% - 48px);
 `
 
-const SignupEmailField = React.forwardRef((_props, ref) => (
-  <StyledEmailTextField
-    variant="outlined"
-    margin="normal"
-    required
-    id="signup-email"
-    label="Email Address"
-    name="signupEmail"
-    type="email"
-    autoComplete="email"
-    autoFocus
-    inputRef={ref}
-  />
-))
+function SignupEmailField({ inputRef }: { inputRef: any }) {
+  return (
+    <StyledEmailTextField
+      variant="outlined"
+      margin="normal"
+      required
+      id="signup-email"
+      label="Email Address"
+      name="signupEmail"
+      type="email"
+      autoComplete="email"
+      autoFocus
+      inputRef={inputRef}
+    />
+  )
+}
 
 const StyledPasswordTextField = styled(TextField)`
   flex: 1;
 `
 
-const SignupPasswordField = React.forwardRef<Ref, { passwordHidden: boolean }>(
-  ({ passwordHidden }, ref) => (
+function SignupPasswordField({
+  passwordHidden,
+  inputRef
+}: {
+  passwordHidden: boolean
+  inputRef: any
+}) {
+  return (
     <StyledPasswordTextField
       variant="outlined"
       margin="normal"
@@ -119,27 +127,32 @@ const SignupPasswordField = React.forwardRef<Ref, { passwordHidden: boolean }>(
       type={passwordHidden ? 'password' : 'text'}
       id="signup-password"
       autoComplete="current-password"
-      inputRef={ref}
+      inputRef={inputRef}
     />
   )
-)
+}
 
-const SignupRepeatPasswordField = React.forwardRef<
-  Ref,
-  { passwordHidden: boolean }
->(({ passwordHidden }, ref) => (
-  <StyledPasswordTextField
-    variant="outlined"
-    margin="normal"
-    required
-    name="repeatPassword"
-    label="Repeat Password"
-    type={passwordHidden ? 'password' : 'text'}
-    id="signup-repeat-password"
-    autoComplete="current-password"
-    inputRef={ref}
-  />
-))
+function SignupRepeatPasswordField({
+  passwordHidden,
+  inputRef
+}: {
+  passwordHidden: boolean
+  inputRef: any
+}) {
+  return (
+    <StyledPasswordTextField
+      variant="outlined"
+      margin="normal"
+      required
+      name="repeatPassword"
+      label="Repeat Password"
+      type={passwordHidden ? 'password' : 'text'}
+      id="signup-repeat-password"
+      autoComplete="current-password"
+      inputRef={inputRef}
+    />
+  )
+}
 
 const StyledFieldGrid = styled(Grid)`
   width: 100%;
@@ -155,7 +168,7 @@ function ManualSignup() {
     watch,
     formState: { dirtyFields }
   } = useForm<SignupInputs>({
-    mode: 'onChange'
+    mode: 'onTouched'
   })
 
   const [passwordHidden, setPasswordHidden] = React.useState(true)
@@ -180,7 +193,7 @@ function ManualSignup() {
               >
                 <StyledFieldGrid item container>
                   <SignupEmailField
-                    ref={register({
+                    inputRef={register({
                       required: true,
                       validate: (value: string) =>
                         EmailValidator.validate(value)
@@ -191,7 +204,7 @@ function ManualSignup() {
                 <StyledFieldGrid item container>
                   <SignupPasswordField
                     passwordHidden={passwordHidden}
-                    ref={register({
+                    inputRef={register({
                       required: true,
                       validate: () => isPasswordStrong(passwordWatch)
                     })}
@@ -204,10 +217,9 @@ function ManualSignup() {
                 <StyledFieldGrid item container>
                   <SignupRepeatPasswordField
                     passwordHidden={repeatPasswordHidden}
-                    ref={register({
+                    inputRef={register({
                       required: true,
-                      validate: (value: string) =>
-                        value === passwordWatch || 'The passwords do not match'
+                      validate: (value: string) => value === passwordWatch
                     })}
                   />
                   <ShowPasswordIcon callback={setRepeatPasswordHidden} />
