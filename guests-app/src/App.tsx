@@ -1,7 +1,6 @@
 import React from 'react'
 import { observer } from 'mobx-react-lite'
 import Home from './pages/Home'
-import Register from './pages/Register'
 import Login from './pages/Login'
 import ManualSignup from './pages/ManualSignup'
 import { IView } from './models/View'
@@ -30,8 +29,6 @@ function renderPage(view: IView) {
   switch (view.page) {
     case '/':
       return <Home />
-    case '/register':
-      return <Register />
     case '/login':
       return <Login />
     case '/manualSignup':

@@ -14,11 +14,11 @@ const Header: React.FC<Props> = () => {
         <button onClick={() => store.view.openLoginPage()}>
           {store.loggedInUser ? 'Logout' : 'Login'}
         </button>
-        {!store.loggedInUser && (
+        {/* {!store.loggedInUser && (
           <button onClick={() => store.view.openRegisterPage()}>
             Register
           </button>
-        )}
+        )} */}
         {store.loggedInUser && (
           <>
             <button onClick={() => store.view.openAnnouncementsPage()}>

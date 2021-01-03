@@ -15,6 +15,10 @@ import VisibilityIcon from '@material-ui/icons/Visibility'
 import IconButton from '@material-ui/core/IconButton'
 import Typography from '@material-ui/core/Typography'
 import PasswordStrengthMeter from '../components/Signup/PasswordStrengthMeter'
+import { useMst } from '../models/reactHook'
+import { useQuery } from '../models/reactUtils'
+import Error from '../components/Error'
+import { observer } from 'mobx-react-lite'
 
 // IconButton which enables showing the password for improved accessibility
 function ShowPasswordIcon({
@@ -50,10 +54,6 @@ type SignupInputs = {
   signupEmail: string
   signupPassword: string
   repeatPassword: string
-}
-
-function signupSubmit(data: SignupInputs): void {
-  console.log('submitting signup form', data)
 }
 
 function isPasswordStrong(password: string) {
@@ -161,6 +161,11 @@ const StyledFieldGrid = styled(Grid)`
 `
 
 function ManualSignup() {
+  const store = useMst()
+  const { data, loading, error, setQuery } = useQuery(undefined, {
+    fetchPolicy: 'no-cache' // not working for mutations :(
+  })
+
   const {
     register,
     handleSubmit,
@@ -184,7 +189,16 @@ function ManualSignup() {
             <Typography component="h1" variant="h5">
               Sivananda Bahamas Guests - Sign Up
             </Typography>
-            <form onSubmit={handleSubmit(signupSubmit)}>
+            <form
+              onSubmit={handleSubmit((data: SignupInputs): void => {
+                setQuery(
+                  store.mutateRegister({
+                    email: data.signupEmail,
+                    password: data.signupPassword
+                  })
+                )
+              })}
+            >
               <Grid
                 container
                 direction="column"
@@ -234,6 +248,16 @@ function ManualSignup() {
                 >
                   Sign Up
                 </Button>
+                <Grid item>
+                  {loading && <p>Registering...</p>}
+                  {error && <Error error={error} />}
+                  {data && (
+                    <>
+                      <p>Registered... {JSON.stringify(data)}</p>
+                      <p>Check your email to verify the registration.</p>
+                    </>
+                  )}
+                </Grid>
               </Grid>
             </form>
           </PaddedPaper>
@@ -243,4 +267,4 @@ function ManualSignup() {
   )
 }
 
-export default ManualSignup
+export default observer(ManualSignup)

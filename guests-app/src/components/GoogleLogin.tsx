@@ -12,7 +12,7 @@ const GSignInButton = styled.a`
   display: inline-block;
   width: 240px;
   height: 50px;
-  background-color: #4285f4;
+  background-color: #003da0;
   color: #fff;
   border-radius: 1px;
   box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.25);
@@ -66,11 +66,12 @@ function GoogleLogin({ onClick }: { onClick: () => void }) {
     <GSignInButton onClick={() => onClick()} href="#">
       <ContentWrapper>
         <LogoWrapper>
-          <Img src="https://developers.google.com/identity/images/g-logo.png" />
+          <Img
+            src="https://developers.google.com/identity/images/g-logo.png"
+            alt="google-sign-in"
+          />
         </LogoWrapper>
-        <TextContainer>
-          <span>Sign in with Google</span>
-        </TextContainer>
+        <TextContainer>Sign in with Google</TextContainer>
       </ContentWrapper>
     </GSignInButton>
   )

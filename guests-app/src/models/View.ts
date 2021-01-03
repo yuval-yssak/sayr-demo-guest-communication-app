@@ -13,7 +13,6 @@ const viewModel = types
       types.literal('/login'),
       types.literal('/manualSignup'),
       types.literal('/announcements'),
-      types.literal('/register'),
       types.literal('/custom')
     ),
     id: types.maybe(types.string)
@@ -45,7 +44,6 @@ const viewModel = types
     },
     openLoginPage: () => (self.page = '/login'),
     openManuualSignupPage: () => (self.page = '/manualSignup'),
-    openRegisterPage: () => (self.page = '/register'),
     openAnnouncementsPage: () => (self.page = '/announcements'),
     setFromURL() {
       const newView = getViewFromURL() as Instance<typeof viewModel>
@@ -79,7 +77,6 @@ function getViewFromURL() {
         return { page: '/' }
       case '/login':
       case '/manualSignup':
-      case '/register':
       case '/announcements':
         return { page: matchedGeneral.path }
       default:

@@ -7,6 +7,7 @@ import LinearProgress from '@material-ui/core/LinearProgress'
 import red from '@material-ui/core/colors/red'
 import amber from '@material-ui/core/colors/amber'
 import green from '@material-ui/core/colors/green'
+import Typography from '@material-ui/core/Typography'
 
 const StyledPasswordMeterDiv = styled.div`
   display: flex;
@@ -43,13 +44,13 @@ function PasswordStrengthMeter({ password }: { password: string }) {
         variant="determinate"
         value={result.percent}
       />
-      <p>
+      <Typography variant="body2" component="p">
         {result.status === 'veryStrong'
           ? 'very strong'
           : result.status === 'veryWeak'
           ? 'very weak'
           : result.status}
-      </p>
+      </Typography>
     </StyledPasswordMeterDiv>
   )
 }
