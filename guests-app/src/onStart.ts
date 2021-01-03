@@ -53,9 +53,16 @@ export default function onStart(
       rootStore.refreshAccessToken()
   })
 
+  // direct user to "login" page if not logged in
   let prevViewSnapshot: ViewSnapshotType | null
   autorun(() => {
-    if (!rootStore.loggedInUser && rootStore.view.page !== '/login') {
+    if (
+      !rootStore.loggedInUser &&
+      ['/login', '/manualSignup'].every(
+        allowedPagesWhenLoggedOut =>
+          rootStore.view.page !== allowedPagesWhenLoggedOut
+      )
+    ) {
       prevViewSnapshot = getSnapshot(rootStore.view)
       rootStore.view.openLoginPage()
     } else if (rootStore.loggedInUser && prevViewSnapshot) {

@@ -11,6 +11,7 @@ const viewModel = types
       types.literal(''),
       types.literal('/'),
       types.literal('/login'),
+      types.literal('/manualSignup'),
       types.literal('/announcements'),
       types.literal('/register'),
       types.literal('/custom')
@@ -43,6 +44,7 @@ const viewModel = types
       self.id = id
     },
     openLoginPage: () => (self.page = '/login'),
+    openManuualSignupPage: () => (self.page = '/manualSignup'),
     openRegisterPage: () => (self.page = '/register'),
     openAnnouncementsPage: () => (self.page = '/announcements'),
     setFromURL() {
@@ -76,6 +78,7 @@ function getViewFromURL() {
       case '/':
         return { page: '/' }
       case '/login':
+      case '/manualSignup':
       case '/register':
       case '/announcements':
         return { page: matchedGeneral.path }

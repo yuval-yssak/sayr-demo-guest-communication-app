@@ -3,6 +3,7 @@ import { observer } from 'mobx-react-lite'
 import Home from './pages/Home'
 import Register from './pages/Register'
 import Login from './pages/Login'
+import ManualSignup from './pages/ManualSignup'
 import { IView } from './models/View'
 import Announcements from './pages/Announcements'
 import CssBaseline from '@material-ui/core/CssBaseline'
@@ -33,6 +34,8 @@ function renderPage(view: IView) {
       return <Register />
     case '/login':
       return <Login />
+    case '/manualSignup':
+      return <ManualSignup />
     case '/announcements':
       return <Announcements />
     default:
