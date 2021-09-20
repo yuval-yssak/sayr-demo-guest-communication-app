@@ -13,10 +13,6 @@ const jwt = {
   secretKeyForRefresh: process.env.JWT_SECRET_KEY_FOR_REFRESH_TOKENS!
 }
 
-const email = {
-  sendGridAPI: process.env.SENDGRID_EMAIL_API_KEY!
-}
-
 const session = {
   secret: process.env.SERVER_SESSION_SECRET!
 }
@@ -46,7 +42,6 @@ const clientGuestAppBaseURL = process.env.CLIENT_GUEST_APP_BASE_URL!
 export {
   mongoDBConfig,
   jwt,
-  email,
   session,
   googleOAuthGuestApp,
   googleOAuthStaffApp,

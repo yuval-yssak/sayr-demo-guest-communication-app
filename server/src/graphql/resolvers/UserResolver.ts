@@ -12,7 +12,7 @@ import {
   ID
 } from 'type-graphql'
 import { compare, hash } from 'bcryptjs'
-import { ObjectID, ObjectId } from 'mongodb'
+import { ObjectId } from 'mongodb'
 import dayjs from 'dayjs'
 import UsersDAO, { IUser, PermissionLevel } from '../../dao/UsersDAO'
 import {
@@ -273,7 +273,7 @@ class UserResolver {
       { email },
       { $set: { permissionLevel } }
     )
-    return result.result.ok === 1
+    return result.acknowledged
   }
 
   @Mutation(() => NotificationSubscription)
@@ -295,7 +295,7 @@ class UserResolver {
     )?.[0]?.subscriptions.find(s => (s.endpoint = endpoint))
     if (subscription) {
       await UsersDAO.updateOne(
-        { _id: new ObjectID(userId), 'subscriptions.endpoint': endpoint },
+        { _id: new ObjectId(userId), 'subscriptions.endpoint': endpoint },
         {
           $set: {
             'subscriptions.$': {
@@ -312,7 +312,7 @@ class UserResolver {
       )
     } else
       await UsersDAO.updateOne(
-        { _id: new ObjectID(userId) },
+        { _id: new ObjectId(userId) },
         {
           $push: {
             subscriptions: {
@@ -366,7 +366,7 @@ class UserResolver {
       subscriptions: []
     })
 
-    return result.result.ok === 1
+    return result.acknowledged
   }
 }
 

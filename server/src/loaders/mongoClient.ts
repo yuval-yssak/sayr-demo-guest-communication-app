@@ -3,9 +3,7 @@ import { MongoClient } from 'mongodb'
 import { mongoDBConfig } from '../config/config'
 
 async function connect() {
-  const client = new MongoClient(mongoDBConfig.DBUrl, {
-    useUnifiedTopology: true
-  })
+  const client = new MongoClient(mongoDBConfig.DBUrl, {})
   await client.connect()
 
   // show connection string without its password

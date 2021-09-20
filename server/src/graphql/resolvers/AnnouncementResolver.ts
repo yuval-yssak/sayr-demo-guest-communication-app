@@ -1,7 +1,7 @@
 import AnnouncementsDAO from '../../dao/AnnouncementsDAO'
 import { Resolver, Arg, Mutation, Query } from 'type-graphql'
 import AnnouncementResponse from '../schema/AnnouncementResponse'
-import { ObjectID } from 'mongodb'
+import { ObjectId } from 'mongodb'
 
 @Resolver()
 export class AnnouncementResolver {
@@ -21,7 +21,7 @@ export class AnnouncementResolver {
       updated_at: new Date()
     }
     const result = await AnnouncementsDAO.insertOne(announcement)
-    return new AnnouncementResponse(result.ops[0])
+    return new AnnouncementResponse({ ...announcement, _id: result.insertedId })
   }
 
   @Query(() => [AnnouncementResponse])
@@ -35,9 +35,10 @@ export class AnnouncementResolver {
   @Mutation(() => Boolean)
   async invalidateAnnouncement(@Arg('_id') _id: string): Promise<boolean> {
     const result = await AnnouncementsDAO.updateOne(
-      { _id: new ObjectID(_id) },
+      { _id: new ObjectId(_id) },
       { $set: { valid: false } }
     )
-    return result.result.nModified === 1
+
+    return result.modifiedCount === 1
   }
 }

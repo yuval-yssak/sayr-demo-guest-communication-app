@@ -61,7 +61,7 @@ export class DayActivitiesResolver {
         }
       }
     )
-    return result.result.nModified === 1
+    return result.modifiedCount === 1
   }
 
   @Mutation(_type => Boolean)
@@ -78,6 +78,6 @@ export class DayActivitiesResolver {
       { date, 'activities.id': new ObjectId(activityID) },
       { $pull: { activities: { id: new ObjectId(activityID) } } }
     )
-    return result.result.nModified === 1
+    return result.modifiedCount === 1
   }
 }

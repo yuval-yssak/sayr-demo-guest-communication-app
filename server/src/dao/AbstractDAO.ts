@@ -1,16 +1,19 @@
 import {
   MongoClient,
   Collection,
-  FilterQuery,
-  CollectionInsertOneOptions,
-  UpdateQuery,
+  Filter,
+  FindOptions,
+  AggregateOptions,
+  ReplaceOptions,
+  InsertOneOptions,
+  UpdateFilter,
   OptionalId
 } from 'mongodb'
 
-class AbstractDAO<TSchema> {
+class AbstractDAO<S> {
   databaseName: string
   dbClient: MongoClient
-  collection: Collection
+  collection: Collection<S>
   COLLECTION_NAME: string
 
   async init(client: MongoClient, dbName: string): Promise<void> {
@@ -24,12 +27,10 @@ class AbstractDAO<TSchema> {
     const alreadyExisting: Collection | undefined = existingCollections.find(
       c => c.collectionName === this.COLLECTION_NAME
     )
-    if (alreadyExisting) {
-      this.collection = alreadyExisting
-    } else {
+    if (!alreadyExisting) {
       await this.dbClient.db(dbName).createCollection(this.COLLECTION_NAME)
-      this.collection = client.db(dbName).collection(this.COLLECTION_NAME)
     }
+    this.collection = client.db(dbName).collection<S>(this.COLLECTION_NAME)
   }
 
   async deleteAll() {
@@ -48,54 +49,57 @@ class AbstractDAO<TSchema> {
     await this.collection.drop()
   }
   // this should only be used when the expected result can be contained in memory as one chunk
-  async findArray(
-    filter: FilterQuery<TSchema>,
-    options = {}
-  ): Promise<TSchema[]> {
-    return await this.collection.find(filter, options).toArray()
+  async findArray<T = S>(filter: Filter<S> = {}, options: FindOptions<S> = {}) {
+    return await this.collection.find<T>(filter, options).toArray()
   }
 
-  async *findSequence(filter: FilterQuery<TSchema>, options = {}) {
-    const cursor = this.collection.find(filter, options)
+  async *findSequence<T = S>(
+    filter: Filter<S>,
+    options: FindOptions<S> = {}
+  ): AsyncGenerator<T> {
+    const cursor = this.collection.find<T>(filter, options)
 
     while (await cursor.hasNext()) {
-      yield await cursor.next()
+      yield await (cursor.next() as Promise<T>)
     }
   }
 
   // this should only be used when the expected result can be contained in memory as one chunk
-  async aggregateArray(pipeline: object[], options = {}) {
-    return await this.collection.aggregate(pipeline, options).toArray()
+  async aggregateArray<T = S>(
+    pipeline: object[],
+    options: AggregateOptions = {}
+  ) {
+    return await this.collection.aggregate<T>(pipeline, options).toArray()
   }
 
-  async *aggregateSequence(pipeline: object[], options = {}) {
-    const cursor = this.collection.aggregate(pipeline, options)
+  async *aggregateSequence<T = S>(
+    pipeline: object[],
+    options: AggregateOptions = {}
+  ): AsyncGenerator<T> {
+    const cursor = this.collection.aggregate<T>(pipeline, options)
 
     while (await cursor.hasNext()) {
-      yield await cursor.next()
+      yield await (cursor.next() as Promise<T>)
     }
   }
 
   async upsert(
-    filter: FilterQuery<TSchema>,
-    newDocument: TSchema,
-    options = {}
+    filter: Filter<S>,
+    newDocument: S,
+    options: ReplaceOptions = {}
   ) {
     return await this.collection.replaceOne(filter, newDocument, {
-      upsert: true,
-      ...options
+      ...options,
+      upsert: true
     })
   }
 
-  async updateOne(filter: FilterQuery<TSchema>, update: UpdateQuery<TSchema>) {
+  async updateOne(filter: Filter<S>, update: UpdateFilter<S>) {
     return await this.collection.updateOne(filter, update)
   }
 
-  async insertOne(
-    doc: OptionalId<TSchema>,
-    options?: CollectionInsertOneOptions
-  ) {
-    return await this.collection.insertOne(doc, options)
+  async insertOne(doc: OptionalId<S>, options?: InsertOneOptions) {
+    return await this.collection.insertOne(doc, options || {})
   }
 
   async countDocuments() {

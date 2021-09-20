@@ -31,45 +31,48 @@ export class NotificationResolver {
     )
     // get recipient endpoints
 
-    const results = await Promise.all(
-      usersWithSubscriptions.map(async user => {
-        webPush.setVapidDetails(
-          webPushVapid.subject,
-          webPushVapid.publicKey,
-          webPushVapid.privateKey
+    const insertObjects = usersWithSubscriptions.map(user => {
+      webPush.setVapidDetails(
+        webPushVapid.subject,
+        webPushVapid.publicKey,
+        webPushVapid.privateKey
+      )
+      user.subscriptions.map(sub => {
+        console.log('sending notifications', sub)
+        webPush.sendNotification(
+          { endpoint: sub.endpoint, keys: sub.keys },
+          JSON.stringify({
+            title: anAnnouncement.subject,
+            content: anAnnouncement.body
+          })
         )
-        user.subscriptions.map(sub => {
-          console.log('sending notifications', sub)
-          webPush.sendNotification(
-            { endpoint: sub.endpoint, keys: sub.keys },
-            JSON.stringify({
-              title: anAnnouncement.subject,
-              content: anAnnouncement.body
-            })
-          )
-        })
-        return await NotificationsDAO.insertOne({
-          parentAnnouncement: new ObjectId(announcementID),
-          recipient: {
-            id: user._id,
-            devices: user.subscriptions.map(sub => ({
-              status: 'initialized',
-              endpoint: sub.endpoint
-            }))
-          },
-          timestamp: new Date()
-        })
       })
-    )
 
-    const resultArray = results.flatMap(result => result.ops as INotification[])
+      return {
+        parentAnnouncement: new ObjectId(announcementID),
+        recipient: {
+          id: user._id,
+          devices: user.subscriptions.map(sub => ({
+            status: 'initialized',
+            endpoint: sub.endpoint
+          }))
+        },
+        timestamp: new Date()
+      } as INotification
+    })
+
+    const inserts = insertObjects.map(async insertObject => {
+      return await NotificationsDAO.insertOne(insertObject)
+    })
+
+    await Promise.all(inserts)
 
     const [announcement] = await AnnouncementsDAO.findArray({
       _id: new ObjectId(announcementID)
     })
     // create notifications entries with the endpoints, set status to initial
 
-    return resultArray
+    return insertObjects
       .map(result => ({ ...result, parentAnnouncement: announcement }))
       .map(result => new NotificationResponse(result))
   }

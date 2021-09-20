@@ -1,4 +1,4 @@
-import { ObjectID } from 'mongodb'
+import { ObjectId } from 'mongodb'
 import {
   IItem,
   IMatchedRegistration,
@@ -42,7 +42,7 @@ export default class RegistrationResponse implements IRegistration {
   payments?: IPayment[]
   items?: IItem[]
 
-  _id: ObjectID
+  _id: ObjectId
 
   constructor({
     reg,

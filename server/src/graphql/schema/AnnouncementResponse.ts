@@ -1,11 +1,11 @@
 import { IAnnouncement } from '../../dao/AnnouncementsDAO'
 import { Field, ID, ObjectType } from 'type-graphql'
-import { ObjectID } from 'mongodb'
+import { ObjectId } from 'mongodb'
 
 @ObjectType()
 export default class AnnouncementResponse implements IAnnouncement {
-  _id: ObjectID
-  @Field(() => ID) id: ObjectID
+  _id: ObjectId
+  @Field(() => ID) id: ObjectId
   @Field() subject: string
   @Field() body: string
   @Field({ nullable: true }) image?: string
