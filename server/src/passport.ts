@@ -7,6 +7,7 @@ import {
 import UsersDAO, { PermissionLevel } from './dao/UsersDAO'
 import { googleOAuthStaffApp, googleOAuthGuestApp } from './config/config'
 
+// this is a middleware called during an OAuth login authentication.
 async function connectOauthToDB(
   accessToken: string,
   refreshToken: string,

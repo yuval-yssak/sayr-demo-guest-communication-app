@@ -82,19 +82,19 @@ async function exchangeToken(req: Request, res: Response): Promise<void> {
     const token = req.cookies.rx as string
 
     if (token) {
-      let payload: AccessTokenPayload
-      payload = verify(token, jwt.secretKeyForRefresh) as AccessTokenPayload
+      const payload = verify(
+        token,
+        jwt.secretKeyForRefresh
+      ) as AccessTokenPayload
 
       if (payload) {
         const user = (
           await usersDao.findArray({ _id: new ObjectId(payload.userId) })
         )?.[0]
 
-        if (user) {
-          if (user.login.tokenVersion === payload.tokenVersion) {
-            res.send({ ok: true, accessToken: createAccessToken(user) })
-            return
-          }
+        if (user && user.login.tokenVersion === payload.tokenVersion) {
+          res.send({ ok: true, accessToken: createAccessToken(user) })
+          return
         }
       }
     }
