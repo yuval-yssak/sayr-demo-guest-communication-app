@@ -17,6 +17,7 @@ async function requestEmailVerification(
     html: `<p>Welcome to the authentication demo.</p><a href="${process.env.SERVER_BASE_URL}/${app}/verify-email/${requestID}">Click here to verify your email address</a>`
   }
   await send(msg)
+  console.log(msg)
   console.log('Email sent')
 }
 

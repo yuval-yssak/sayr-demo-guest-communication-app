@@ -23,7 +23,12 @@ import cookieParser from 'cookie-parser'
 import cors from 'cors'
 import session from 'express-session'
 import passport from './passport'
-import { session as sessionConfig, mongoDBConfig } from './config/config'
+import {
+  session as sessionConfig,
+  mongoDBConfig,
+  clientGuestAppBaseURL,
+  clientStaffAppBaseURL
+} from './config/config'
 import ConnectMondbSession from 'connect-mongodb-session'
 
 const app = express()
@@ -34,8 +39,8 @@ app.use(
     credentials: true,
     origin: [
       /^http:\/\/localhost:.*$/,
-      process.env.CLIENT_GUEST_APP_BASE_URL!,
-      process.env.CLIENT_STAFF_APP_BASE_URL!
+      clientGuestAppBaseURL,
+      clientStaffAppBaseURL
     ]
   })
 )

@@ -39,6 +39,10 @@ const webPushVapid = {
   privateKey: process.env.WEB_PUSH_VAPID_PRIVATE_KEY!
 }
 
+const clientStaffAppBaseURL = process.env.CLIENT_STAFF_APP_BASE_URL!
+
+const clientGuestAppBaseURL = process.env.CLIENT_GUEST_APP_BASE_URL!
+
 export {
   mongoDBConfig,
   jwt,
@@ -46,5 +50,7 @@ export {
   session,
   googleOAuthGuestApp,
   googleOAuthStaffApp,
-  webPushVapid
+  webPushVapid,
+  clientStaffAppBaseURL,
+  clientGuestAppBaseURL
 }
