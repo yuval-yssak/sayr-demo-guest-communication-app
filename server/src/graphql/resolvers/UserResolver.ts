@@ -22,7 +22,7 @@ import {
   installRefreshTokenCookie,
   removeRefreshTokenCookie,
   authenticateClient,
-  MyContext,
+  Context,
   createTokensAfterPasswordVerified
 } from '../../auth/auth'
 import requestEmailVerification from '../../emailVerification'
@@ -125,7 +125,7 @@ class UserResolver {
   // get only when authenticated
   @Query(() => String)
   @UseMiddleware(authenticateClient)
-  tellASecret(@Ctx() { payload }: MyContext) {
+  tellASecret(@Ctx() { payload }: Context) {
     return `secret info..., your user id is ${payload.userId}`
   }
 
@@ -134,7 +134,7 @@ class UserResolver {
   async register(
     @Arg('email') email: string,
     @Arg('password') password: string,
-    @Ctx() { req }: MyContext
+    @Ctx() { req }: Context
   ) {
     const app =
       req.headers.origin === process.env.CLIENT_STAFF_APP_BASE_URL
@@ -215,7 +215,7 @@ class UserResolver {
   async login(
     @Arg('email') email: string,
     @Arg('password') password: string,
-    @Ctx() { res }: MyContext
+    @Ctx() { res }: Context
   ): Promise<LoginResponse> {
     // find user record by email
     const [user] = await UsersDAO.findArray({ email })
@@ -234,14 +234,14 @@ class UserResolver {
   }
 
   @Mutation(() => Boolean)
-  logout(@Ctx() { res }: MyContext): boolean {
+  logout(@Ctx() { res }: Context): boolean {
     removeRefreshTokenCookie(res)
     return true
   }
 
   @Mutation(() => LoginResponse)
   async finishLoginWithGoogle(
-    @Ctx() { req, res }: MyContext
+    @Ctx() { req, res }: Context
   ): Promise<LoginResponse> {
     const user = (req.session as any).user as IUser
     if (!user) throw new Error('server session is empty')

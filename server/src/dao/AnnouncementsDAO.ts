@@ -1,16 +1,35 @@
-import { WithId } from 'mongodb'
+import { ObjectId, WithId } from 'mongodb'
 import AbstractDAO from './AbstractDAO'
 
-export type IAnnouncement = WithId<{
+export enum Audience {
+  ALL_RESIDENTS_AND_VISITORS = 'ALL_RESIDENTS_AND_VISITORS',
+  ALL_RESIDENTS = 'ALL_RESIDENTS',
+  ALL_RESIDENTS_GUESTS = 'ALL_RESIDENTS_GUESTS',
+  ALL_RESIDENTS_GUESTS_NO_CHILDREN = 'ALL_RESIDENTS_GUESTS_NO_CHILDREN',
+  ALL_STAFF_KARMA_YOGIS = 'ALL_STAFF_KARMA_YOGIS',
+  ALL_KARMA_YOGIS = 'ALL_KARMA_YOGIS',
+  ALL_STAFF = 'ALL_STAFF',
+  ALL_SPEAKERS = 'ALL_SPEAKERS',
+  STUDENTS_IN_COURSE = 'STUDENTS_IN_COURSE'
+}
+
+export type Announcement = {
   subject: string
   body: string
-  image?: string
-  valid: boolean
-  created_at: Date
-  updated_at: Date
-}>
+  createdAt: Date
+  createdByUser: ObjectId
+  publishStart: Date
+  publishEnd: Date
+  sendAlert: boolean
+  priority: 'low' | 'high'
+  audience: Audience
+}
 
-class AnnouncementsDAO extends AbstractDAO<IAnnouncement> {
+export type AnnouncementDA = Announcement & {
+  confirmations: { personId: number; timestamp: Date }[]
+}
+
+class AnnouncementsDAO extends AbstractDAO<WithId<AnnouncementDA>> {
   COLLECTION_NAME = 'announcements'
 }
 

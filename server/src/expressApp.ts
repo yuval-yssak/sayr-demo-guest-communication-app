@@ -39,6 +39,7 @@ app.use(
     credentials: true,
     origin: [
       /^http:\/\/localhost:.*$/,
+      'https://studio.apollographql.com',
       clientGuestAppBaseURL,
       clientStaffAppBaseURL
     ]

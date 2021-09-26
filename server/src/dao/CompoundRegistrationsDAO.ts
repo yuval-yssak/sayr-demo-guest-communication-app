@@ -1,61 +1,27 @@
 import { MongoClient, WithId } from 'mongodb'
+import { Registration, RegistrationMatched, RegistrationStatus } from ''
 import AbstractDAO from './AbstractDAO'
 
-export type ITransactionStatus = 'cancel' | 'complete' | 'fail'
-export type IPayment = any & { status: ITransactionStatus } // TODO: type this
-export type IItem = any & { status: ITransactionStatus } // TODO: type this
-
-export type IRegistrationStatus =
-  | 'checked-out'
-  | 'reserved'
-  | 'cancelled'
-  | 'arrived'
-export type IRegistration = {
+export type CompoundPerson = {
   id: number
-  parent_registration_id?: number
-  status: IRegistrationStatus
-
-  submitted: string
-  start_date: string
-  end_date: string
-  first_name: string
-  last_name: string
-  email: string
-  program: string
-  program_id: number
-  room_id: number
-  room: string | null
-  lodging_id: number
-  lodging: string | null
-  total_items: number
-  total_payments: number
-  total_taxes: number
-  grand_total: number
-  balance_due: number
-  registration_total: number
-  questions: {
-    [q: string]: string
-  }
-  payments?: IPayment[]
-  items?: IItem[]
+  registrations: RegistrationMatched[]
+  otherRegistrations?: {
+    id: number
+    status: RegistrationStatus
+    start_date: string
+    end_date: string
+    room: string | null
+    program: string
+  }[]
 }
 
-export type IMatchedRegistration = IRegistration & {
-  person_id: number
+export type Compound = {
+  persons?: CompoundPerson[]
+  unmatchedRegistrations?: Registration[]
 }
 
-export type IPerson = {
-  id: number
-  registrations: IMatchedRegistration[]
-}
-
-export type ICompoundRegistration = WithId<{
-  persons?: IPerson[]
-  unmatchedRegistrations?: IRegistration[]
-}>
-
-class CompoundRegistrationsDAO extends AbstractDAO<ICompoundRegistration> {
-  COLLECTION_NAME = 'compoundRegistrations'
+class CompoundsDAO extends AbstractDAO<WithId<Compound>> {
+  COLLECTION_NAME = 'compounds'
 
   async init(client: MongoClient, dbName: string): Promise<void> {
     await super.init(client, dbName)
@@ -93,4 +59,4 @@ class CompoundRegistrationsDAO extends AbstractDAO<ICompoundRegistration> {
   }
 }
 
-export default new CompoundRegistrationsDAO()
+export default new CompoundsDAO()

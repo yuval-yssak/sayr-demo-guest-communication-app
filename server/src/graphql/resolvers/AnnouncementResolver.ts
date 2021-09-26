@@ -1,34 +1,77 @@
-import AnnouncementsDAO from '../../dao/AnnouncementsDAO'
-import { Resolver, Arg, Mutation, Query } from 'type-graphql'
-import AnnouncementResponse from '../schema/AnnouncementResponse'
+import AnnouncementsDAO, {
+  AnnouncementDA,
+  Audience
+} from '../../dao/AnnouncementsDAO'
+import { Resolver, Arg, Mutation, Query, Ctx } from 'type-graphql'
+import {
+  AnnouncementResponse,
+  CreateAnnouncementInput
+} from '../schema/Announcement'
 import { ObjectId } from 'mongodb'
+import { Context } from 'src/auth/auth'
 
-@Resolver()
+@Resolver(_of => AnnouncementResponse)
 export class AnnouncementResolver {
   @Mutation(() => AnnouncementResponse)
   async createAnnouncement(
-    @Arg('subject') subject: string,
-    @Arg('body') body: string,
-    @Arg('valid', { defaultValue: true }) valid: boolean,
-    @Arg('image', { nullable: true }) image?: string
+    @Arg('newAnnouncement') newAnnouncement: CreateAnnouncementInput,
+    @Ctx() ctx: Context
   ): Promise<AnnouncementResponse> {
-    const announcement = {
-      subject,
-      body,
-      valid,
-      image,
-      created_at: new Date(),
-      updated_at: new Date()
+    const announcement: AnnouncementDA = {
+      ...newAnnouncement,
+      publishStart: newAnnouncement.publishStart || new Date(),
+      createdAt: new Date(),
+      createdByUser: ctx.payload?.userId || 'not a user yet',
+      confirmations: []
     }
+
     const result = await AnnouncementsDAO.insertOne(announcement)
-    return new AnnouncementResponse({ ...announcement, _id: result.insertedId })
+
+    return Object.assign(new AnnouncementResponse(), announcement, {
+      id: result.insertedId
+    })
+  }
+
+  // TODO: If authorized only - give stats
+  @Query(() => [AnnouncementResponse])
+  async getActiveAnnouncements(): Promise<AnnouncementResponse[]> {
+    const activeAnnouncements = await AnnouncementsDAO.findArray({
+      publishEnd: { $gte: new Date() }
+    })
+    return activeAnnouncements.map(announcement => {
+      // get all persons who are meant to get this announcement
+      // iterate through the confirmations and match them to the persons.
+      // build the stats array with the persons and fill out their read timestamps
+
+      if (announcement.audience === Audience.ALL_KARMA_YOGIS) {
+      }
+      const stats = [
+        {
+          person: {
+            id: new ObjectId('123412341234123412341234'),
+            name: 'John'
+          },
+          readTimestamp:
+            Math.random() > 0.5 ? null : new Date(Date.now() - 1000 * 3600)
+        }
+      ]
+
+      const fullResponse: AnnouncementResponse = {
+        ...announcement,
+        stats
+      }
+
+      return Object.assign(new AnnouncementResponse(), fullResponse)
+    })
   }
 
   @Query(() => [AnnouncementResponse])
-  async getAllValidAnnouncements(): Promise<AnnouncementResponse[]> {
-    const announcements = await AnnouncementsDAO.findArray({ valid: true })
-    return announcements.map(
-      announcement => new AnnouncementResponse(announcement)
+  async getArchivedAnnouncements(): Promise<AnnouncementResponse[]> {
+    const archivedAnnouncements = await AnnouncementsDAO.findArray({
+      publishEnd: { $lt: new Date() }
+    })
+    return archivedAnnouncements.map(announcement =>
+      Object.assign(new AnnouncementResponse(), announcement)
     )
   }
 

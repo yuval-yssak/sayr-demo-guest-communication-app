@@ -9,7 +9,7 @@ import { verify } from 'jsonwebtoken'
 import usersDao, { IUser } from '../dao/UsersDAO'
 import { MiddlewareFn } from 'type-graphql'
 
-export interface MyContext {
+export interface Context {
   req: Request
   res: Response
   payload: AccessTokenPayload
@@ -105,7 +105,7 @@ async function exchangeToken(req: Request, res: Response): Promise<void> {
   }
 }
 
-const authenticateClient: MiddlewareFn<MyContext> = ({ context }, next) => {
+const authenticateClient: MiddlewareFn<Context> = ({ context }, next) => {
   const { authentication } = context.req.headers
 
   if (!authentication) throw new Error('not authenticated')

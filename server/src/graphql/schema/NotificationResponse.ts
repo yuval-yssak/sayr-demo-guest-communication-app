@@ -1,7 +1,7 @@
 import { Field, ID, ObjectType } from 'type-graphql'
 import { ObjectId } from 'mongodb'
-import AnnouncementResponse from './AnnouncementResponse'
-import { IAnnouncement } from '../../dao/AnnouncementsDAO'
+import { AnnouncementResponse } from './Announcement'
+import { Announcement } from '../../dao/AnnouncementsDAO'
 import { INotificationStatus } from '../../dao/NotificationsDAO'
 
 @ObjectType()
@@ -36,7 +36,7 @@ export default class NotificationResponse {
 
   constructor(notification: {
     _id: ObjectId
-    parentAnnouncement: IAnnouncement
+    parentAnnouncement: Announcement
     timestamp: Date
     recipient: {
       id: ObjectId
@@ -47,7 +47,8 @@ export default class NotificationResponse {
     }
   }) {
     this._id = this.id = notification._id
-    this.parentAnnouncement = new AnnouncementResponse(
+    this.parentAnnouncement = Object.assign(
+      new AnnouncementResponse(),
       notification.parentAnnouncement
     )
     this.timestamp = notification.timestamp
